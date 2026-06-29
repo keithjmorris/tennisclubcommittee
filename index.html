@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Burnhams Tennis Club</title>
+  <link rel="apple-touch-icon" href="caslogo.png">
+  <link rel="icon" type="image/png" href="caslogo.png">
+  <meta name="theme-color" content="#2979FF">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f1f5f9; color:#0f172a; min-height:100vh; }
+
+    /* ── LOGIN ── */
+    .login-wrap { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+    .login-card { background:#fff; border-radius:12px; padding:40px; width:100%; max-width:400px; box-shadow:0 4px 24px rgba(0,0,0,0.08); }
+    .login-card h1 { color:#2979FF; font-size:22px; font-weight:700; margin-bottom:4px; }
+    .login-card p { color:#64748b; font-size:14px; margin-bottom:28px; }
+    .login-card label { display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:5px; }
+    .login-card input { width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:8px; font-size:15px; margin-bottom:16px; outline:none; }
+    .login-card input:focus { border-color:#2979FF; }
+    .login-card button { width:100%; padding:11px; background:#2979FF; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:500; cursor:pointer; }
+    .login-card button:hover { background:#1a56cc; }
+    .login-error { color:#ef4444; font-size:13px; margin-top:10px; min-height:18px; }
+
+    /* ── APP SHELL ── */
+    #app { display:none; min-height:100vh; padding-bottom:70px; }
+
+    /* ── TOP HEADER ── */
+    .app-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; }
+    .app-header-logo { height:40px; }
+    .app-header-title { font-size:16px; font-weight:600; color:#0f172a; }
+    .sign-out-btn { background:none; border:1px solid #e2e8f0; border-radius:6px; padding:6px 12px; font-size:13px; color:#475569; cursor:pointer; }
+    .sign-out-btn:hover { background:#f1f5f9; }
+
+    /* ── BOTTOM TAB BAR ── */
+    .tab-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #e2e8f0; display:flex; z-index:100; }
+    .tab-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px 4px; font-size:10px; color:#94a3b8; cursor:pointer; gap:3px; border:none; background:none; }
+    .tab-item .tab-icon { font-size:20px; }
+    .tab-item.active { color:#2979FF; }
+
+    /* ── PAGES ── */
+    .page { display:none; padding:16px; max-width:760px; margin:0 auto; }
+    .page.active { display:block; }
+
+    /* ── FINANCES ── */
+    #loading-message { text-align:center; color:#666; padding:32px; }
+    .list-card { background:#2979FF; border-radius:14px; overflow:hidden; }
+    .list-row { display:flex; justify-content:space-between; align-items:center; padding:16px 18px; color:#fff; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.15); }
+    .list-row:last-child { border-bottom:none; }
+    .list-row:hover { background:#1a56cc; }
+    .list-row .chevron { font-size:14px; opacity:0.7; }
+
+    /* ── FINANCE DETAIL ── */
+    #detail-view, #chart-view { display:none; }
+    .back-button { display:inline-flex; align-items:center; gap:6px; color:#2979FF; font-size:16px; cursor:pointer; padding:8px 0; margin-bottom:12px; background:none; border:none; }
+    .detail-title { font-size:18px; font-weight:600; color:#222; margin-bottom:12px; }
+    .section-card { background:#2979FF; border-radius:14px; margin-bottom:12px; overflow-x:auto; }
+    .fin-parent-row:hover { background:rgba(255,255,255,0.08); }
+    .fin-parent-row td:first-child { user-select:none; }
+    table { width:100%; border-collapse:collapse; min-width:320px; }
+    .section-heading { padding:12px 14px 6px; color:#fff; font-weight:700; font-size:15px; }
+    th,td { padding:6px 10px; color:#fff; font-size:14px; white-space:nowrap; }
+    th { font-weight:600; font-size:13px; opacity:0.75; text-align:right; padding-bottom:4px; }
+    th:first-child,td:first-child { text-align:left; opacity:1; }
+    td:not(:first-child) { text-align:right; font-variant-numeric:tabular-nums; }
+    tr.data-row+tr.data-row td { border-top:1px solid rgba(255,255,255,0.12); }
+    .notes-card { background:#2979FF; border-radius:14px; padding:14px 16px; color:#fff; font-size:14px; margin-bottom:12px; }
+    .notes-label { font-weight:700; margin-bottom:4px; }
+    .notes-text { opacity:0.85; }
+    .chart-buttons { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .chart-btn { flex:1; min-width:120px; padding:12px 8px; background:#2979FF; color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; }
+    .chart-btn:hover { background:#1a56cc; }
+    .chart-card { background:#2979FF; border-radius:14px; padding:20px; margin-bottom:12px; }
+    .chart-title { color:#fff; font-size:16px; font-weight:700; text-align:center; margin-bottom:16px; }
+    .chart-canvas-wrapper { max-width:340px; margin:0 auto; }
+
+    /* ── MEETINGS SHARED ── */
+    .meetings-page h2 { font-size:20px; font-weight:700; margin-bottom:4px; }
+    .meetings-page .subtitle { font-size:14px; color:#64748b; margin-bottom:20px; }
+    .mtab-bar { display:flex; border-bottom:2px solid #e2e8f0; margin-bottom:0; }
+    .mtab { padding:10px 18px; font-size:13px; font-weight:500; color:#64748b; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; background:none; border-top:none; border-left:none; border-right:none; }
+    .mtab:hover { color:#0f172a; }
+    .mtab.active { color:#2979FF; border-bottom-color:#2979FF; font-weight:600; }
+    .mtab-content { display:none; }
+    .mtab-content.active { display:block; }
+    .card { background:#fff; border-radius:10px; padding:20px; margin-bottom:16px; border:1px solid #e2e8f0; }
+    .meeting-row { cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:14px 18px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:10px; }
+    .meeting-row:hover { background:#f8fafc; }
+    .meeting-row-title { font-weight:600; font-size:15px; }
+    .meeting-row-date { font-size:13px; color:#64748b; margin-top:3px; }
+    .meeting-badges { display:flex; gap:6px; }
+    .mbadge { padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
+    .mbadge-agenda { background:#f0fdf4; color:#166534; }
+    .mbadge-minutes { background:#eff6ff; color:#2563eb; }
+
+    /* Sub tabs inside a meeting */
+    .sub-tab-bar { display:flex; border-bottom:2px solid #e2e8f0; margin-bottom:0; }
+    .sub-tab { padding:8px 18px; font-size:13px; font-weight:500; color:#64748b; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; background:none; border-top:none; border-left:none; border-right:none; }
+    .sub-tab.active { color:#2979FF; border-bottom-color:#2979FF; font-weight:600; }
+    .sub-panel { display:none; }
+    .sub-panel.active { display:block; }
+
+    /* Forms */
+    label { display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:5px; }
+    input[type=text],input[type=date],input[type=email],input[type=password],select,textarea { width:100%; padding:9px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; font-family:inherit; background:#f8fafc; }
+    input:focus,select:focus,textarea:focus { border-color:#2979FF; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .form-row-full { margin-bottom:14px; }
+    .form-actions { display:flex; gap:10px; margin-top:16px; }
+    .btn { padding:9px 20px; background:#2979FF; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; }
+    .btn:hover { background:#1a56cc; }
+    .btn-secondary { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+    .btn-secondary:hover { background:#e2e8f0; }
+    .btn-sm { padding:5px 12px; font-size:12px; border-radius:6px; }
+    .btn-danger { background:#ef4444; color:#fff; border:none; }
+
+    /* Action cards */
+    .action-card { border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px; margin-bottom:10px; background:#fafafa; }
+    .action-title { font-size:15px; font-weight:600; }
+    .action-meta { font-size:12px; color:#94a3b8; margin-top:3px; margin-bottom:8px; }
+    .action-desc { font-size:14px; color:#374151; margin-bottom:10px; }
+    .action-footer { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .status-badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+    .status-open { background:#fef9c3; color:#854d0e; }
+    .status-inprogress { background:#eff6ff; color:#2563eb; }
+    .status-completed { background:#dcfce7; color:#166534; }
+    .status-signeoff { background:#f0fdf4; color:#166534; }
+    .carried-section { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #e2e8f0; }
+    .carried-heading { font-size:13px; font-weight:600; color:#64748b; margin-bottom:10px; }
+    .section-heading-dark { font-size:14px; font-weight:600; color:#0f172a; margin-bottom:12px; }
+    .compose-area { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #e2e8f0; }
+
+    /* Filter buttons */
+    .filter-btn-group { display:flex; gap:8px; }
+    .filter-btn { padding:5px 12px; font-size:12px; border-radius:6px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; cursor:pointer; }
+    .filter-btn.active { background:#2979FF; color:#fff; border-color:#2979FF; }
+
+    /* Manage users */
+    .user-row { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:8px; }
+    .user-row-info { font-size:14px; }
+    .user-row-role { font-size:12px; color:#64748b; margin-top:2px; }
+    .role-badge { padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; margin-left:6px; }
+    .role-superadmin { background:#fdf2f8; color:#9d174d; }
+    .role-admin { background:#eff6ff; color:#2563eb; }
+    .role-ceo { background:#f0fdf4; color:#166534; }
+    .role-other { background:#f1f5f9; color:#475569; }
+
+    /* Comments */
+    .comment-item { padding:8px 10px; background:#f8fafc; border-radius:6px; margin-bottom:6px; }
+    .comment-meta { font-size:12px; color:#94a3b8; margin-bottom:3px; }
+    .comment-text { font-size:13px; color:#374151; }
+
+    /* Empty state */
+    .empty-state { color:#94a3b8; font-size:14px; padding:12px 0; }
+
+    /* ── GROUPS ── */
+    .group-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .group-card:hover { background: #f8fafc; }
+    .group-card-title { font-size: 15px; font-weight: 600; color: #0f172a; }
+    .group-card-meta { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+    .group-type-badge { padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .group-type-standing { background: #eff6ff; color: #2563eb; }
+    .group-type-subcommittee { background: #fdf4ff; color: #7e22ce; }
+    .group-type-event { background: #fef9c3; color: #854d0e; }
+    .group-section-heading { font-size: 13px; font-weight: 600; color: #64748b; margin: 18px 0 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .group-doc-card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px; margin-bottom:10px; }
+    .group-doc-card-row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .placeholder-card { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; padding:24px; text-align:center; color:#64748b; font-size:14px; }
+    .member-picker { display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:10px; background:#f8fafc; }
+    .member-picker label { display:flex; align-items:center; gap:8px; font-weight:400; font-size:13px; margin-bottom:0; }
+    .dropzone { border:2px dashed #cbd5e1; border-radius:8px; padding:24px; text-align:center; cursor:pointer; margin-bottom:10px; background:#f8fafc; }
+    .dropzone .dz-icon { font-size:24px; margin-bottom:6px; }
+    .dropzone .dz-text { font-size:14px; color:#64748b; }
+
+    /* ── DISCUSSION (used inside groups) ── */
+    .topic-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .topic-card:hover { background: #f8fafc; }
+    .topic-title { font-size: 15px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+    .topic-meta { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+    .topic-preview { font-size: 13px; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .topic-footer { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .topic-reply-count { font-size: 12px; color: #94a3b8; margin-left: auto; }
+    .reply-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+    .reply-meta { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+    .reply-body { font-size: 14px; color: #374151; white-space: pre-wrap; line-height: 1.6; }
+    .topic-body-full { font-size: 14px; color: #374151; white-space: pre-wrap; line-height: 1.6; margin-bottom: 12px; }
+    .topic-detail-header { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .topic-detail-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .attachment-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2979FF; margin-top: 8px; cursor: pointer; }
+
+    @media(max-width:600px) {
+      .form-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ LOGIN ═══ -->
+<div id="login-wrap" class="login-wrap">
+  <div class="login-card">
+    <h1>The Burnhams Tennis Club</h1>
+    <p>Sign in to continue</p>
+    <label for="login-email">Email</label>
+    <input type="email" id="login-email" placeholder="you@example.com" />
+    <label for="login-password">Password</label>
+    <input type="password" id="login-password" placeholder="••••••••" />
+    <button id="login-btn">Sign in</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ APP ═══ -->
+<div id="app">
+
+  <!-- Top header -->
+  <header class="app-header">
+    <img src="caslogo.jpeg" class="app-header-logo" alt="The Burnhams Tennis Club" onerror="this.style.display='none';document.getElementById('header-title-text').style.display='block';" />
+    <span id="header-title-text" style="display:none;font-size:18px;font-weight:700;color:#2979FF;font-style:italic;">The Burnhams Tennis Club</span>
+    <div id="header-user-info" style="display:flex;align-items:center;gap:10px;">
+      <span id="header-user-email" style="font-size:12px;color:#94a3b8;"></span>
+      <button class="sign-out-btn" id="sign-out-btn">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Pages -->
+  <div id="page-finances" class="page active meetings-page">
+    <h2>Finances</h2>
+    <p class="subtitle">Income &amp; expenditure, balance sheet and investments</p>
+    <div class="mtab-bar">
+      <button class="mtab active" data-mtab="fin-tab-ie">Income &amp; Expenditure</button>
+      <button class="mtab" data-mtab="fin-tab-balance">Balance Sheet</button>
+      <button class="mtab" data-mtab="fin-tab-investments">Investments</button>
+    </div>
+
+    <!-- Income & Expenditure sub-tab (existing content, unchanged) -->
+    <div class="mtab-content active" id="fin-tab-ie" style="margin-top:16px;">
+      <div id="loading-message">Loading…</div>
+      <div id="list-view">
+        <div class="list-card" id="list-card" style="display:none;"></div>
+      </div>
+      <div id="detail-view">
+        <button class="back-button" id="back-to-list">‹ &nbsp;Back</button>
+        <div class="detail-title" id="detail-title"></div>
+        <div id="detail-content"></div>
+      </div>
+      <div id="chart-view">
+        <button class="back-button" id="back-to-detail">‹ &nbsp;Back</button>
+        <div class="detail-title" id="chart-month-title"></div>
+        <div class="chart-card">
+          <div class="chart-title" id="chart-title"></div>
+          <div class="chart-canvas-wrapper"><canvas id="myChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Balance Sheet sub-tab -->
+    <div class="mtab-content" id="fin-tab-balance" style="margin-top:16px;">
+      <div id="balance-loading-message" style="text-align:center;color:#666;padding:32px;">Loading…</div>
+      <div id="balance-list-view">
+        <div class="list-card" id="balance-list-card" style="display:none;"></div>
+      </div>
+      <div id="balance-detail-view" style="display:none;">
+        <button class="back-button" id="balance-back-to-list">‹ &nbsp;Back</button>
+        <div class="detail-title" id="balance-detail-title"></div>
+        <div id="balance-detail-content"></div>
+      </div>
+    </div>
+
+    <!-- Investments sub-tab — shows the latest investment performance PDF -->
+    <div class="mtab-content" id="fin-tab-investments" style="margin-top:16px;">
+      <div id="investments-loading" style="text-align:center;color:#666;padding:32px;">Loading…</div>
+      <div id="investments-content" style="display:none;">
+        <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:600;margin-bottom:2px;">📄 Investment Performance Report</div>
+            <div id="investments-updated" style="font-size:12px;color:#94a3b8;"></div>
+          </div>
+          <a href="#" id="investments-download-link" class="btn btn-sm" style="text-decoration:none;" onclick="downloadFile(window._investmentsPdfUrl, 'Investment Performance Report.pdf'); return false;">⬇ Download</a>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff;">
+          <iframe id="investments-pdf-frame" style="width:100%;height:75vh;border:none;display:block;" title="Investment Performance Report"></iframe>
+        </div>
+        <p style="font-size:12px;color:#94a3b8;margin-top:8px;">If the PDF doesn't display above, use the Download button instead.</p>
+      </div>
+      <div id="investments-empty" style="display:none;">
+        <p class="empty-state">No investment performance report has been uploaded yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOARD PAGE -->
+  <div id="page-board" class="page meetings-page">
+    <h2>Board</h2>
+    <p class="subtitle">Meetings, papers and actions</p>
+    <div class="mtab-bar">
+      <button class="mtab active" data-mtab="board-tab-meetings">Meetings</button>
+      <button class="mtab" data-mtab="board-tab-outstanding">Outstanding Actions</button>
+      <button class="mtab" data-mtab="board-tab-all">All Actions</button>
+    </div>
+
+    <!-- Meetings tab -->
+    <div class="mtab-content active" id="board-tab-meetings">
+      <div id="board-meetings-list-view" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <strong>Board Meetings</strong>
+          <button class="btn btn-sm" id="board-add-meeting-btn" style="display:none;">+ New Meeting</button>
+        </div>
+        <div id="board-meetings-list"><p class="empty-state">Loading...</p></div>
+      </div>
+      <div id="board-add-meeting-form" style="display:none;" class="card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Meeting</h3>
+        <div class="form-row">
+          <div><label>Meeting Title</label><input type="text" id="board-meeting-title" placeholder="e.g. Board Meeting — June 2026"></div>
+          <div><label>Meeting Date</label><input type="date" id="board-meeting-date"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="board-save-meeting-btn">Save Meeting</button>
+          <button class="btn btn-secondary" id="board-cancel-meeting-btn">Cancel</button>
+        </div>
+      </div>
+      <div id="board-meeting-detail" style="display:none;">
+        <button class="back-button" id="board-back-to-meetings">‹ &nbsp;Meetings</button>
+        <h3 id="board-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
+        <p id="board-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
+        <div class="sub-tab-bar">
+          <button class="sub-tab active" data-subtab="board-panel-papers">Papers</button>
+          <button class="sub-tab" data-subtab="board-panel-minutes">Minutes</button>
+          <button class="sub-tab" data-subtab="board-panel-actions">Actions</button>
+        </div>
+        <div id="board-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
+          <div id="board-papers-compose" class="compose-area" style="display:none;">
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <label>Document Description</label>
+              <input type="text" id="board-papers-desc" placeholder="e.g. Agenda, Directors Report, Financial Summary...">
+            </div>
+            <label>Select File</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
+            <div id="board-papers-dropzone" class="dropzone">
+              <div class="dz-icon">📎</div>
+              <div class="dz-text">Drag and drop a file here, or click to browse</div>
+              <input type="file" id="board-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="board-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="board-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="board-post-papers-btn">Upload Document</button>
+          </div>
+          <div id="board-papers-content"></div>
+        </div>
+        <div id="board-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+          <div id="board-minutes-compose" class="compose-area" style="display:none;">
+            <label>Upload Minutes</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx). Uploading a new file will replace the existing minutes.</p>
+            <div id="board-minutes-dropzone" class="dropzone">
+              <div class="dz-icon">📋</div>
+              <div class="dz-text">Drag and drop minutes here, or click to browse</div>
+              <input type="file" id="board-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="board-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="board-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="board-post-minutes-btn">Upload Minutes</button>
+          </div>
+          <div id="board-minutes-content"></div>
+        </div>
+        <div id="board-panel-actions" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+          <div class="carried-section">
+            <div class="carried-heading">⟳ Carried Over from Previous Meetings</div>
+            <div id="board-carried-list"></div>
+          </div>
+          <div class="section-heading-dark">Actions Arising from This Meeting</div>
+          <div id="board-actions-compose" class="compose-area" style="display:none;">
+            <div class="form-row">
+              <div><label>Action Title</label><input type="text" id="board-action-title" placeholder="e.g. Review Q2 report"></div>
+              <div><label>Assigned To</label>
+                <select id="board-action-assigned">
+                  <option value="Chair">Chair</option>
+                  <option value="CEO">CEO</option>
+                  <option value="Trustee">Trustee</option>
+                  <option value="All Trustees">All Trustees</option>
+                </select>
+              </div>
+              <div><label>Target Date</label><input type="date" id="board-action-target"></div>
+              <div><label>Status</label>
+                <select id="board-action-status">
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row-full"><label>Description</label><textarea id="board-action-desc" rows="3"></textarea></div>
+            <div class="form-row-full">
+              <label><input type="checkbox" id="board-action-staff-visible" style="width:auto;margin-right:6px;">Visible to staff</label>
+            </div>
+            <button class="btn" id="board-post-action-btn">Add Action</button>
+          </div>
+          <div id="board-meeting-actions-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outstanding actions tab -->
+    <div class="mtab-content" id="board-tab-outstanding" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <strong>Outstanding Actions</strong>
+        <div class="filter-btn-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="Open">Open</button>
+          <button class="filter-btn" data-filter="In Progress">In Progress</button>
+        </div>
+      </div>
+      <div id="board-outstanding-list"></div>
+    </div>
+
+    <!-- All actions tab -->
+    <div class="mtab-content" id="board-tab-all" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <strong>All Actions</strong>
+        <div class="filter-btn-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="open">Open</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+      </div>
+      <div id="board-all-list"></div>
+    </div>
+  </div>
+
+  <!-- FINANCE COMMITTEE PAGE (identical structure, different prefix) -->
+  <div id="page-finance-committee" class="page meetings-page">
+    <h2>Finance Committee</h2>
+    <p class="subtitle">Meetings, papers and actions</p>
+    <div class="mtab-bar">
+      <button class="mtab active" data-mtab="fc-tab-meetings">Meetings</button>
+      <button class="mtab" data-mtab="fc-tab-outstanding">Outstanding Actions</button>
+      <button class="mtab" data-mtab="fc-tab-all">All Actions</button>
+    </div>
+    <div class="mtab-content active" id="fc-tab-meetings">
+      <div id="fc-meetings-list-view" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <strong>Finance Committee Meetings</strong>
+          <button class="btn btn-sm" id="fc-add-meeting-btn" style="display:none;">+ New Meeting</button>
+        </div>
+        <div id="fc-meetings-list"><p class="empty-state">Loading...</p></div>
+      </div>
+      <div id="fc-add-meeting-form" style="display:none;" class="card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Meeting</h3>
+        <div class="form-row">
+          <div><label>Meeting Title</label><input type="text" id="fc-meeting-title"></div>
+          <div><label>Meeting Date</label><input type="date" id="fc-meeting-date"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="fc-save-meeting-btn">Save Meeting</button>
+          <button class="btn btn-secondary" id="fc-cancel-meeting-btn">Cancel</button>
+        </div>
+      </div>
+      <div id="fc-meeting-detail" style="display:none;">
+        <button class="back-button" id="fc-back-to-meetings">‹ &nbsp;Meetings</button>
+        <h3 id="fc-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
+        <p id="fc-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
+        <div class="sub-tab-bar">
+          <button class="sub-tab active" data-subtab="fc-panel-papers">Papers</button>
+          <button class="sub-tab" data-subtab="fc-panel-minutes">Minutes</button>
+          <button class="sub-tab" data-subtab="fc-panel-actions">Actions</button>
+        </div>
+        <div id="fc-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
+          <div id="fc-papers-compose" class="compose-area" style="display:none;">
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <label>Document Description</label>
+              <input type="text" id="fc-papers-desc" placeholder="e.g. Agenda, Financial Summary...">
+            </div>
+            <label>Select File</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
+            <div id="fc-papers-dropzone" class="dropzone">
+              <div class="dz-icon">📎</div>
+              <div class="dz-text">Drag and drop a file here, or click to browse</div>
+              <input type="file" id="fc-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="fc-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="fc-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="fc-post-papers-btn">Upload Document</button>
+          </div>
+          <div id="fc-papers-content"></div>
+        </div>
+        <div id="fc-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+          <div id="fc-minutes-compose" class="compose-area" style="display:none;">
+            <label>Upload Minutes</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Uploading a new file will replace the existing minutes.</p>
+            <div id="fc-minutes-dropzone" class="dropzone">
+              <div class="dz-icon">📋</div>
+              <div class="dz-text">Drag and drop minutes here, or click to browse</div>
+              <input type="file" id="fc-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="fc-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="fc-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="fc-post-minutes-btn">Upload Minutes</button>
+          </div>
+          <div id="fc-minutes-content"></div>
+        </div>
+        <div id="fc-panel-actions" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+          <div class="carried-section"><div class="carried-heading">⟳ Carried Over from Previous Meetings</div><div id="fc-carried-list"></div></div>
+          <div class="section-heading-dark">Actions Arising from This Meeting</div>
+          <div id="fc-actions-compose" class="compose-area" style="display:none;">
+            <div class="form-row">
+              <div><label>Action Title</label><input type="text" id="fc-action-title"></div>
+              <div><label>Assigned To</label><select id="fc-action-assigned"><option>Chair</option><option>CEO</option><option>Trustee</option><option>All Trustees</option></select></div>
+              <div><label>Target Date</label><input type="date" id="fc-action-target"></div>
+              <div><label>Status</label><select id="fc-action-status"><option value="Open">Open</option><option value="In Progress">In Progress</option></select></div>
+            </div>
+            <div class="form-row-full"><label>Description</label><textarea id="fc-action-desc" rows="3"></textarea></div>
+            <div class="form-row-full"><label><input type="checkbox" id="fc-action-staff-visible" style="width:auto;margin-right:6px;">Visible to staff</label></div>
+            <button class="btn" id="fc-post-action-btn">Add Action</button>
+          </div>
+          <div id="fc-meeting-actions-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mtab-content" id="fc-tab-outstanding" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <strong>Outstanding Actions</strong>
+        <div class="filter-btn-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="Open">Open</button>
+          <button class="filter-btn" data-filter="In Progress">In Progress</button>
+        </div>
+      </div>
+      <div id="fc-outstanding-list"></div>
+    </div>
+    <div class="mtab-content" id="fc-tab-all" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <strong>All Actions</strong>
+        <div class="filter-btn-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="open">Open</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+      </div>
+      <div id="fc-all-list"></div>
+    </div>
+  </div>
+
+  <!-- FUNDRAISING COMMITTEE PAGE -->
+  <div id="page-fundraising" class="page meetings-page">
+    <h2>Fundraising Committee</h2>
+    <p class="subtitle">Meetings, papers and actions</p>
+    <div class="mtab-bar">
+      <button class="mtab active" data-mtab="fundraising-tab-meetings">Meetings</button>
+      <button class="mtab" data-mtab="fundraising-tab-outstanding">Outstanding Actions</button>
+      <button class="mtab" data-mtab="fundraising-tab-all">All Actions</button>
+    </div>
+    <div class="mtab-content active" id="fundraising-tab-meetings">
+      <div id="fundraising-meetings-list-view" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <strong>Fundraising Committee Meetings</strong>
+          <button class="btn btn-sm" id="fundraising-add-meeting-btn" style="display:none;">+ New Meeting</button>
+        </div>
+        <div id="fundraising-meetings-list"><p class="empty-state">Loading...</p></div>
+      </div>
+      <div id="fundraising-add-meeting-form" style="display:none;" class="card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Meeting</h3>
+        <div class="form-row">
+          <div><label>Meeting Title</label><input type="text" id="fundraising-meeting-title"></div>
+          <div><label>Meeting Date</label><input type="date" id="fundraising-meeting-date"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="fundraising-save-meeting-btn">Save Meeting</button>
+          <button class="btn btn-secondary" id="fundraising-cancel-meeting-btn">Cancel</button>
+        </div>
+      </div>
+      <div id="fundraising-meeting-detail" style="display:none;">
+        <button class="back-button" id="fundraising-back-to-meetings">‹ &nbsp;Meetings</button>
+        <h3 id="fundraising-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
+        <p id="fundraising-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
+        <div class="sub-tab-bar">
+          <button class="sub-tab active" data-subtab="fundraising-panel-papers">Papers</button>
+          <button class="sub-tab" data-subtab="fundraising-panel-minutes">Minutes</button>
+          <button class="sub-tab" data-subtab="fundraising-panel-actions">Actions</button>
+        </div>
+        <div id="fundraising-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
+          <div id="fundraising-papers-compose" class="compose-area" style="display:none;">
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <label>Document Description</label>
+              <input type="text" id="fundraising-papers-desc" placeholder="e.g. Agenda, Financial Summary...">
+            </div>
+            <label>Select File</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
+            <div id="fundraising-papers-dropzone" class="dropzone">
+              <div class="dz-icon">📎</div>
+              <div class="dz-text">Drag and drop a file here, or click to browse</div>
+              <input type="file" id="fundraising-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="fundraising-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="fundraising-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="fundraising-post-papers-btn">Upload Document</button>
+          </div>
+          <div id="fundraising-papers-content"></div>
+        </div>
+        <div id="fundraising-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+          <div id="fundraising-minutes-compose" class="compose-area" style="display:none;">
+            <label>Upload Minutes</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Uploading a new file will replace the existing minutes.</p>
+            <div id="fundraising-minutes-dropzone" class="dropzone">
+              <div class="dz-icon">📋</div>
+              <div class="dz-text">Drag and drop minutes here, or click to browse</div>
+              <input type="file" id="fundraising-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="fundraising-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="fundraising-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="fundraising-post-minutes-btn">Upload Minutes</button>
+          </div>
+          <div id="fundraising-minutes-content"></div>
+        </div>
+        <div id="fundraising-panel-actions" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+          <div class="carried-section"><div class="carried-heading">⟳ Carried Over from Previous Meetings</div><div id="fundraising-carried-list"></div></div>
+          <div class="section-heading-dark">Actions Arising from This Meeting</div>
+          <div id="fundraising-actions-compose" class="compose-area" style="display:none;">
+            <div class="form-row">
+              <div><label>Action Title</label><input type="text" id="fundraising-action-title"></div>
+              <div><label>Assigned To</label><select id="fundraising-action-assigned"><option>Chair</option><option>CEO</option><option>Trustee</option><option>All Trustees</option></select></div>
+              <div><label>Target Date</label><input type="date" id="fundraising-action-target"></div>
+              <div><label>Status</label><select id="fundraising-action-status"><option value="Open">Open</option><option value="In Progress">In Progress</option></select></div>
+            </div>
+            <div class="form-row-full"><label>Description</label><textarea id="fundraising-action-desc" rows="3"></textarea></div>
+            <div class="form-row-full"><label><input type="checkbox" id="fundraising-action-staff-visible" style="width:auto;margin-right:6px;">Visible to staff</label></div>
+            <button class="btn" id="fundraising-post-action-btn">Add Action</button>
+          </div>
+          <div id="fundraising-meeting-actions-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mtab-content" id="fundraising-tab-outstanding" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <strong>Outstanding Actions</strong>
+        <div class="filter-btn-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="Open">Open</button>
+          <button class="filter-btn" data-filter="In Progress">In Progress</button>
+        </div>
+      </div>
+      <div id="fundraising-outstanding-list"></div>
+    </div>
+    <div class="mtab-content" id="fundraising-tab-all" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <strong>All Actions</strong>
+        <div class="filter-btn-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="open">Open</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+      </div>
+      <div id="fundraising-all-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ GROUPS PAGE (new) ═══════════════════════ -->
+  <div id="page-groups" class="page">
+
+    <!-- Groups list view -->
+    <div id="groups-list-view">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <h2 style="font-size:20px;font-weight:700;">Groups</h2>
+        <button class="btn btn-sm" id="groups-new-group-btn" style="display:none;">+ New Group</button>
+      </div>
+      <p class="subtitle" style="margin-bottom:16px;">Documents and discussion, organised by area</p>
+      <div id="groups-standing-list"><p class="empty-state">Loading...</p></div>
+      <div id="groups-other-section" style="display:none;">
+        <div class="group-section-heading">Sub-committees &amp; Events</div>
+        <div id="groups-other-list"></div>
+      </div>
+    </div>
+
+    <!-- New group form -->
+    <div id="groups-new-group-form" style="display:none;" class="card">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Group</h3>
+      <div class="form-row">
+        <div><label>Group Name *</label><input type="text" id="ng-name" placeholder="e.g. Resurfacing Sub-Committee"></div>
+        <div><label>Type</label>
+          <select id="ng-type">
+            <option value="subcommittee">Sub-committee</option>
+            <option value="event">Event</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-full">
+        <label><input type="checkbox" id="ng-has-discussion" style="width:auto;margin-right:6px;" checked>Include a discussion area</label>
+      </div>
+      <div class="form-row-full">
+        <label style="margin-bottom:8px;">Members (who can see this group)</label>
+        <div class="member-picker" id="ng-member-picker">
+          <p class="empty-state">Loading users...</p>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn" id="ng-save-btn">Create Group</button>
+        <button class="btn btn-secondary" id="ng-cancel-btn">Cancel</button>
+      </div>
+      <div id="ng-error" style="color:#ef4444;font-size:13px;margin-top:10px;"></div>
+    </div>
+
+    <!-- Group detail view -->
+    <div id="group-detail-view" style="display:none;">
+      <button class="back-button" id="group-back-to-list">‹ &nbsp;Groups</button>
+      <h3 id="group-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
+      <p id="group-detail-meta" style="font-size:13px;color:#64748b;margin-bottom:16px;"></p>
+
+      <div class="sub-tab-bar" id="group-detail-tabs">
+        <button class="sub-tab active" data-subtab="group-panel-documents">Documents</button>
+        <button class="sub-tab" data-subtab="group-panel-discussion" id="group-discussion-tab-btn" style="display:none;">Discussion</button>
+        <button class="sub-tab" data-subtab="group-panel-members" id="group-members-tab-btn" style="display:none;">Members</button>
+      </div>
+
+      <!-- Documents panel -->
+      <div id="group-panel-documents" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
+        <div id="group-docs-placeholder" style="display:none;">
+          <div class="placeholder-card">This area is reserved for the upcoming Agendas &amp; Minutes migration and isn't in use yet.</div>
+        </div>
+        <div id="group-docs-active">
+          <div id="group-docs-compose" class="compose-area" style="display:none;">
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <label>Document Description</label>
+              <input type="text" id="group-doc-desc" placeholder="e.g. Pitch quotation, Grant application...">
+            </div>
+            <label>Select File</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx)</p>
+            <div id="group-doc-dropzone" class="dropzone">
+              <div class="dz-icon">📎</div>
+              <div class="dz-text">Drag and drop a file here, or click to browse</div>
+              <input type="file" id="group-doc-file" accept=".pdf,.doc,.docx" style="display:none;">
+            </div>
+            <div id="group-doc-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="group-doc-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="group-doc-upload-btn">Upload Document</button>
+          </div>
+          <div id="group-docs-content"></div>
+        </div>
+      </div>
+
+      <!-- Discussion panel -->
+      <div id="group-panel-discussion" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+        <div id="group-disc-list-view">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+            <button class="btn btn-sm" id="group-disc-new-topic-btn">+ New Topic</button>
+          </div>
+          <div id="group-disc-topics-list"><p class="empty-state">Loading...</p></div>
+        </div>
+        <div id="group-disc-new-topic-form" style="display:none;">
+          <div class="form-row-full"><label>Title *</label><input type="text" id="group-disc-topic-title" placeholder="What would you like to discuss?"></div>
+          <div class="form-row-full"><label>Message *</label><textarea id="group-disc-topic-body" rows="5" placeholder="Share your thoughts..."></textarea></div>
+          <div class="form-row-full">
+            <label style="margin-bottom:6px;">Attachment (optional)</label>
+            <div id="group-disc-topic-dropzone" class="dropzone" style="padding:16px;">
+              <div class="dz-text">📎 Drag and drop or click to attach a file</div>
+              <input type="file" id="group-disc-topic-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none;">
+            </div>
+            <div id="group-disc-topic-file-selected" style="font-size:13px;color:#2979FF;margin-top:6px;"></div>
+          </div>
+          <div id="group-disc-topic-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Posting...</div>
+          <div class="form-actions">
+            <button class="btn" id="group-disc-post-topic-btn">Post Topic</button>
+            <button class="btn btn-secondary" id="group-disc-cancel-topic-btn">Cancel</button>
+          </div>
+        </div>
+        <div id="group-disc-thread-view" style="display:none;">
+          <button class="back-button" id="group-disc-back-to-list">‹ &nbsp;All Topics</button>
+          <div id="group-disc-thread-content"></div>
+          <div class="card" style="margin-top:16px;">
+            <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;">Reply</h4>
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <textarea id="group-disc-reply-body" rows="3" placeholder="Write your reply..."></textarea>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div id="group-disc-reply-dropzone" class="dropzone" style="padding:12px;">
+                <div class="dz-text" style="font-size:13px;">📎 Attach a file (optional)</div>
+                <input type="file" id="group-disc-reply-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none;">
+              </div>
+              <div id="group-disc-reply-file-selected" style="font-size:13px;color:#2979FF;margin-top:4px;"></div>
+            </div>
+            <div id="group-disc-reply-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Posting...</div>
+            <button class="btn" id="group-disc-post-reply-btn">Post Reply</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members panel (view-only list; editing happens via Manage Users / edit group) -->
+      <div id="group-panel-members" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
+        <div id="group-members-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE USERS PAGE -->
+  <div id="page-manage-users" class="page">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Manage Users</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <p style="font-size:14px;color:#64748b;">All users with access to The Burnhams Tennis Club.</p>
+      <button class="btn" id="add-user-btn">+ Add User</button>
+    </div>
+    <div id="add-user-form" style="display:none;" class="card">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;" id="user-form-heading">New User</h3>
+      <!--
+        The UID must match the Firebase Authentication User UID exactly.
+        Find it in Firebase Console → Authentication → click the user → copy User UID.
+        This is used as the Firestore document ID so the app can look up the user's role on login.
+      -->
+      <div class="form-row-full" style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:14px;">
+        <p style="font-size:13px;color:#854d0e;">⚠ The Firebase UID must be copied exactly from Firebase Console → Authentication → click the user → User UID.</p>
+      </div>
+      <div class="form-row">
+        <div style="grid-column:1/-1;"><label>Firebase Auth UID *</label><input type="text" id="new-user-uid" placeholder="e.g. dHbM7nwQj1h8CPQ54Df6h7..."></div>
+        <div><label>First Name</label><input type="text" id="new-user-firstname"></div>
+        <div><label>Last Name</label><input type="text" id="new-user-lastname"></div>
+        <div><label>Email</label><input type="email" id="new-user-email"></div>
+        <div><label>Role</label>
+          <select id="new-user-role">
+            <!-- Superadmin/Admin options are inserted here by JS only when the
+                 signed-in user is a superadmin — see setupUI(). A plain admin
+                 never sees those options, and the rules reject the write even
+                 if they were added to the DOM by hand. -->
+            <option value="ceo">CEO</option>
+            <option value="trustee">Trustee</option>
+            <option value="staff">Staff</option>
+          </select>
+        </div>
+      </div>
+      <!-- Committee membership -->
+      <div style="margin-bottom:14px;">
+        <label style="margin-bottom:8px;">Committee membership</label>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-board" style="width:auto;"> Board</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-fc" style="width:auto;"> Finance Committee</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-fundraising" style="width:auto;"> Fundraising Committee</label>
+        </div>
+      </div>
+      <!-- Chair roles -->
+      <div style="margin-bottom:14px;">
+        <label style="margin-bottom:8px;">Chair of</label>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-board" style="width:auto;"> Board</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-fc" style="width:auto;"> Finance Committee</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-fundraising" style="width:auto;"> Fundraising Committee</label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn" id="save-user-btn">Save User</button>
+        <button class="btn btn-secondary" id="cancel-user-btn">Cancel</button>
+      </div>
+      <div id="user-form-error" style="color:#ef4444;font-size:13px;margin-top:10px;"></div>
+    </div>
+    <div id="users-list"></div>
+  </div>
+
+  <!-- BOTTOM TAB BAR -->
+  <nav class="tab-bar">
+    <button class="tab-item active" data-tab="finances"><span class="tab-icon">💰</span>Finances</button>
+    <button class="tab-item" data-tab="board"><span class="tab-icon">🗂</span>Board</button>
+    <button class="tab-item" data-tab="finance-committee"><span class="tab-icon">📊</span>Finance Cttee</button>
+    <button class="tab-item" data-tab="fundraising"><span class="tab-icon">🎗</span>Fundraising</button>
+    <button class="tab-item" data-tab="groups"><span class="tab-icon">📁</span>Groups</button>
+  </nav>
+
+</div><!-- end #app -->
+
+
+<script type="module">
+  import { auth, db, storage } from './firebase-config.js';
+  import {
+    signInWithEmailAndPassword, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, query,
+    where, orderBy, serverTimestamp, increment
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import {
+    ref, uploadBytesResumable, getDownloadURL, getMetadata
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  // ── STATE ──────────────────────────────────────────────────────────────────
+
+  let currentUser = null;
+  let currentUserData = null; // Firestore user doc
+  let currentChart = null;
+  let currentFinanceQuarter = null;
+  let allQuarters = [];
+  let allUsers = []; // cached list of {id, ...data} for member pickers etc.
+
+  // Per-committee current meeting id
+  const currentMeetingId = { board: null, fc: null, fundraising: null };
+
+  // ── AUTH ───────────────────────────────────────────────────────────────────
+
+  document.getElementById('login-btn').addEventListener('click', async () => {
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errEl    = document.getElementById('login-error');
+    if (!email || !password) { errEl.textContent = 'Please enter email and password.'; return; }
+    document.getElementById('login-btn').textContent = 'Signing in...';
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch(e) {
+      errEl.textContent = 'Invalid email or password.';
+      document.getElementById('login-btn').textContent = 'Sign in';
+    }
+  });
+
+  /*
+    downloadFile fetches the file as a blob and triggers a native
+    browser download, bypassing Safari's popup blocker and cross-origin
+    restrictions that can cause the page to hang on some iPhones.
+  */
+  window.downloadFile = async function(url, fileName) {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = fileName || 'document';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch(e) {
+      window.open(url, '_blank');
+    }
+  };
+
+  document.getElementById('sign-out-btn').addEventListener('click', () => signOut(auth));
+
+  onAuthStateChanged(auth, async user => {
+    if (user) {
+      currentUser = user;
+      document.getElementById('login-wrap').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      document.getElementById('header-user-email').textContent = user.email;
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        currentUserData = snap.exists() ? snap.data() : {};
+      } catch(e) { currentUserData = {}; }
+      setupUI();
+      loadFinancesData();
+      loadMeetings('board');
+      loadMeetings('fc');
+      loadMeetings('fundraising');
+      loadGroups();
+    } else {
+      currentUser = null;
+      currentUserData = null;
+      document.getElementById('login-wrap').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+    }
+  });
+
+  // ── ROLE HELPERS ───────────────────────────────────────────────────────────
+
+  function isSuperAdmin() { return currentUserData?.role === 'superadmin'; }
+  function isAdmin()  { return currentUserData?.role === 'admin' || isSuperAdmin(); }
+  function isCEO()    { return currentUserData?.role === 'ceo' || isAdmin(); }
+
+  function canPostForCommittee(committee) {
+    if (isCEO()) return true;
+    if (committee === 'board')       return currentUserData?.chairBoard === true;
+    if (committee === 'fc')          return currentUserData?.chairFC === true;
+    if (committee === 'fundraising') return currentUserData?.chairFundraising === true;
+    return false;
+  }
+
+  function canSignOff() { return isCEO() || currentUserData?.chairBoard || currentUserData?.chairFC || currentUserData?.chairFundraising; }
+
+  // ── UI SETUP ───────────────────────────────────────────────────────────────
+
+  function setupUI() {
+    ['board','fc','fundraising'].forEach(c => {
+      if (canPostForCommittee(c)) {
+        document.getElementById(c + '-add-meeting-btn').style.display = 'inline-block';
+      }
+    });
+    if (isAdmin()) {
+      document.getElementById('groups-new-group-btn').style.display = 'inline-block';
+    }
+    if (isAdmin()) {
+      const adminBtn = document.createElement('button');
+      adminBtn.className = 'tab-item';
+      adminBtn.innerHTML = '<span class="tab-icon">⚙️</span>Users';
+      adminBtn.addEventListener('click', () => {
+        showPage('manage-users');
+        loadUsers();
+      });
+      document.querySelector('.tab-bar').appendChild(adminBtn);
+    }
+    // Superadmins get the Admin/Superadmin options in the role dropdown.
+    // Regular admins never see these — and even if they were added to the
+    // DOM by hand, the Firestore rules reject the write server-side.
+    if (isSuperAdmin()) {
+      const roleSelect = document.getElementById('new-user-role');
+      const superOpt = document.createElement('option');
+      superOpt.value = 'superadmin'; superOpt.textContent = 'Super Admin';
+      const adminOpt = document.createElement('option');
+      adminOpt.value = 'admin'; adminOpt.textContent = 'Admin';
+      roleSelect.insertBefore(superOpt, roleSelect.firstChild);
+      roleSelect.insertBefore(adminOpt, roleSelect.firstChild);
+    }
+  }
+
+  // ── TAB NAVIGATION ─────────────────────────────────────────────────────────
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById('page-' + name);
+    if (el) el.classList.add('active');
+  }
+
+  document.querySelectorAll('.tab-item[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showPage(btn.dataset.tab);
+      if (btn.dataset.tab === 'finances') {
+        document.getElementById('detail-view').style.display = 'none';
+        document.getElementById('chart-view').style.display = 'none';
+        document.getElementById('list-view').style.display = 'block';
+        document.getElementById('balance-detail-view').style.display = 'none';
+        document.getElementById('balance-list-view').style.display = 'block';
+        const financesPage = document.getElementById('page-finances');
+        financesPage.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+        financesPage.querySelectorAll('.mtab-content').forEach(c => c.classList.remove('active'));
+        financesPage.querySelector('[data-mtab="fin-tab-ie"]').classList.add('active');
+        document.getElementById('fin-tab-ie').classList.add('active');
+      }
+      if (btn.dataset.tab === 'groups') {
+        document.getElementById('group-detail-view').style.display = 'none';
+        document.getElementById('groups-new-group-form').style.display = 'none';
+        document.getElementById('groups-list-view').style.display = 'block';
+      }
+    });
+  });
+
+  // ── MEETING TABS (mtab) ────────────────────────────────────────────────────
+
+  document.querySelectorAll('.mtab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetId = tab.dataset.mtab;
+      const parent = tab.closest('.meetings-page');
+      parent.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+      parent.querySelectorAll('.mtab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(targetId).classList.add('active');
+      const prefix = targetId.split('-tab-')[0];
+      if (targetId.endsWith('-outstanding')) loadOutstandingActions(prefix);
+      if (targetId.endsWith('-all')) loadAllActions(prefix);
+      if (targetId === 'fin-tab-investments' && !window._investmentsLoaded) {
+        window._investmentsLoaded = true;
+        loadInvestmentsData();
+      }
+    });
+  });
+
+  // ── SUB TABS (agenda/minutes/actions, and group detail tabs) ──────────────
+
+  document.querySelectorAll('.sub-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetId = tab.dataset.subtab;
+      const parent = tab.closest('.sub-tab-bar').parentElement;
+      tab.closest('.sub-tab-bar').querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      parent.querySelectorAll('.sub-panel').forEach(p => {
+        p.style.display = p.id === targetId ? 'block' : 'none';
+        if (p.id === targetId) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+      const prefix = targetId.split('-panel-')[0];
+      if (targetId.endsWith('-actions') && prefix !== 'group') {
+        loadMeetingActions(prefix);
+        loadCarriedActions(prefix);
+      }
+      if (targetId === 'group-panel-discussion') loadGroupDiscussionTopics();
+      if (targetId === 'group-panel-members') renderGroupMembersList();
+    });
+  });
+
+  // ── FINANCES ───────────────────────────────────────────────────────────────
+
+  const FINANCE_DATA_PATH = 'finance/finances.json';
+
+  async function loadFinancesData() {
+    try {
+      const fileRef = ref(storage, FINANCE_DATA_PATH);
+      const url = await getDownloadURL(fileRef);
+      const resp = await fetch(url);
+      const json = await resp.json();
+      allQuarters = json;
+      buildFinanceList();
+    } catch(e) {
+      console.error(e);
+      document.getElementById('loading-message').textContent = 'Could not load financial data.';
+    }
+  }
+
+  const INVESTMENTS_PDF_PATH = 'finance/investments.pdf';
+
+  async function loadInvestmentsData() {
+    const loadingEl = document.getElementById('investments-loading');
+    const contentEl = document.getElementById('investments-content');
+    const emptyEl = document.getElementById('investments-empty');
+    try {
+      const fileRef = ref(storage, INVESTMENTS_PDF_PATH);
+      const url = await getDownloadURL(fileRef);
+      window._investmentsPdfUrl = url;
+      document.getElementById('investments-pdf-frame').src = url;
+      try {
+        const meta = await getMetadata(fileRef);
+        const updated = meta.updated ? new Date(meta.updated) : null;
+        document.getElementById('investments-updated').textContent = updated
+          ? `Last updated ${updated.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}`
+          : '';
+      } catch(metaErr) { /* nice-to-have only */ }
+      loadingEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      emptyEl.style.display = 'none';
+    } catch(e) {
+      loadingEl.style.display = 'none';
+      contentEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+    }
+  }
+
+  function buildFinanceList() {
+    const card = document.getElementById('list-card');
+    card.innerHTML = '';
+    allQuarters.forEach(quarter => {
+      const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `<span>${label}</span><span class="chevron">›</span>`;
+      row.onclick = () => showFinanceDetail(quarter.id);
+      card.appendChild(row);
+    });
+    document.getElementById('loading-message').style.display = 'none';
+    card.style.display = 'block';
+    buildBalanceList();
+  }
+
+  function buildBalanceList() {
+    const card = document.getElementById('balance-list-card');
+    card.innerHTML = '';
+    allQuarters.forEach(quarter => {
+      const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `<span>${label}</span><span class="chevron">›</span>`;
+      row.onclick = () => showBalanceDetail(quarter.id);
+      card.appendChild(row);
+    });
+    document.getElementById('balance-loading-message').style.display = 'none';
+    card.style.display = 'block';
+  }
+
+  const INCOME_STRUCTURE = [
+    { label:'ACE NPO',                                    field:'aceNpo',        bold:true },
+    { label:'Fundraising events',                         field:'fundraisingEvents', bold:true },
+    { label:'Patronage & individual donations / gift aid', bold:true, children:[
+      { label:'Individuals', field:'patronageIndividuals' },
+      { label:'Gift Aid',     field:'patronageGiftAid' },
+      { label:'Corporate',    field:'patronageCorporate' },
+    ]},
+    { label:'Paid Events',                                field:'paidEventsIncome', bold:true },
+    { label:'Restricted Donations Grants - Core',         field:'restrictedGrantsCore', bold:true },
+    { label:'Restricted Donations Grants - Acquisitions',  field:'restrictedGrantsAcquisitions', bold:true },
+    { label:'Restricted Donations Digital',               field:'restrictedDigital', bold:true },
+    { label:'Consultancy',                                field:'consultancy', bold:true },
+    { label:'Other items', bold:true, children:[
+      { label:'Legacies',                field:'otherLegacies' },
+      { label:'Bank Interest',            field:'otherBankInterest' },
+      { label:'Sales of Misc Artworks',   field:'otherSalesMiscArtworks' },
+      { label:'Historic VAT recovery',    field:'otherHistoricVatRecovery' },
+    ]},
+    { label:'Museum Subscriptions',                       field:'museumSubscriptions', bold:true },
+  ];
+
+  const EXPENDITURE_STRUCTURE = [
+    { label:'Staff, consultants & Other related costs', bold:true, children:[
+      { label:'Salaries NI pension', field:'staffSalariesNiPension' },
+      { label:'Other staff costs',   field:'staffOtherCosts' },
+    ]},
+    { label:'Non Staff Costs', bold:true, children:[
+      { label:'Property & Insurance Costs',   field:'nonStaffPropertyInsurance' },
+      { label:'Operational Costs',             field:'nonStaffOperational' },
+      { label:'IT',                            field:'nonStaffIT' },
+      { label:'Legal, Professional & finance', field:'nonStaffLegalProfessionalFinance' },
+    ]},
+    { label:'Art Purchase - Core',            field:'artPurchaseCore', bold:true },
+    { label:'Art Purchase - Special Projects', field:'artPurchaseSpecialProjects', bold:true },
+    { label:'Events',                         field:'eventsExpenditure', bold:true },
+    { label:'Other Expenditure', bold:true, children:[
+      { label:'Paid Events',                 field:'otherExpPaidEvents' },
+      { label:'Project Costs - New Website', field:'otherExpProjectCostsNewWebsite' },
+    ]},
+  ];
+
+  const FIXED_ASSETS_STRUCTURE = [
+    { label:'Property',                   field:'property', bold:true },
+    { label:'Other Tangible Fixed Assets', field:'otherTangibleFixedAssets', bold:true },
+    { label:'Investment - Future Fund',    field:'investmentFutureFund', bold:true },
+  ];
+
+  const CURRENT_ASSETS_STRUCTURE = [
+    { label:'Debtors',                    field:'debtors', bold:true },
+    { label:'Stock',                      field:'stock', bold:true },
+    { label:'Cash',                       field:'cash', bold:true },
+    { label:'Creditors',                  field:'creditors', bold:true },
+    { label:'Deferred Restricted Grants', field:'deferredRestrictedGrants', bold:true },
+  ];
+
+  const UNRESTRICTED_RESERVES_STRUCTURE = [
+    { label:'Unrestricted reserves brought forward', field:'broughtForward', bold:true },
+    { label:'Transfer to Future Fund',                field:'transferToFutureFund', bold:true },
+    { label:'Unrestricted result for the period',     field:'resultForPeriod', bold:true },
+    { label:'Transfer to Restricted funds',           field:'transferToRestrictedFunds', bold:true },
+  ];
+
+  const DESIGNATED_FUTURE_FUND_STRUCTURE = [
+    { label:'Designated Future Fund brought forward', field:'broughtForward', bold:true },
+    { label:'Designated Future Fund Investment',       field:'investment', bold:true },
+    { label:'(Losses)/Gains in the period',            field:'lossesGainsInPeriod', bold:true },
+  ];
+
+  const COLUMN_KEYS = ['actual', 'forecast', 'plan', 'prevYear'];
+  const COLUMN_LABELS = { actual:'Actual', forecast:'Forecast', plan:'Plan', prevYear:'Prev Year' };
+  const BS_COLUMN_KEYS = ['actual', 'prevYear'];
+
+  function emptyFigures(columnKeys = COLUMN_KEYS) {
+    const f = {};
+    columnKeys.forEach(k => f[k] = 0);
+    return f;
+  }
+
+  function getFigures(quarter, group, field, columnKeys = COLUMN_KEYS) {
+    return (quarter[group] && quarter[group][field]) || emptyFigures(columnKeys);
+  }
+
+  function computeTotal(quarter, group, line, columnKeys = COLUMN_KEYS) {
+    if (line.children) {
+      const total = emptyFigures(columnKeys);
+      line.children.forEach(child => {
+        const childTotal = computeTotal(quarter, group, child, columnKeys);
+        columnKeys.forEach(k => total[k] += childTotal[k]);
+      });
+      return total;
+    }
+    return getFigures(quarter, group, line.field, columnKeys);
+  }
+
+  function sumStructure(quarter, group, structure, columnKeys = COLUMN_KEYS) {
+    const total = emptyFigures(columnKeys);
+    structure.forEach(line => {
+      const t = computeTotal(quarter, group, line, columnKeys);
+      columnKeys.forEach(k => total[k] += t[k]);
+    });
+    return total;
+  }
+
+  function fmt(v) { return new Intl.NumberFormat('en-GB').format(Math.abs(Math.round(v))); }
+  function fmtCell(v) { return v < 0 ? `(${fmt(v)})` : fmt(v); }
+
+  function renderLine(quarter, group, line, depth, expandedSet, rowsOut, columnKeys = COLUMN_KEYS) {
+    const total = computeTotal(quarter, group, line, columnKeys);
+    const hasChildren = !!line.children;
+    const isExpanded = hasChildren && expandedSet.has(line.label);
+    const indent = 14 + depth * 16;
+    const toggle = hasChildren
+      ? `<span class="fin-toggle" data-toggle-label="${encodeURIComponent(line.label)}" style="cursor:pointer;display:inline-block;width:14px;">${isExpanded ? '▾' : '▸'}</span>`
+      : `<span style="display:inline-block;width:14px;"></span>`;
+    const labelClass = line.bold || hasChildren ? 'style="font-weight:700;"' : '';
+    const rowClass = hasChildren ? 'class="data-row fin-parent-row"' : 'class="data-row"';
+    const clickAttr = hasChildren ? `data-toggle-label="${encodeURIComponent(line.label)}" style="cursor:pointer;"` : '';
+    rowsOut.push(`<tr ${rowClass} ${clickAttr}>
+      <td style="padding-left:${indent}px;" ${labelClass}>${toggle}${line.label}</td>
+      ${columnKeys.map(k => `<td>${fmtCell(total[k])}</td>`).join('')}
+    </tr>`);
+    if (hasChildren && isExpanded) {
+      line.children.forEach(child => renderLine(quarter, group, child, depth + 1, expandedSet, rowsOut, columnKeys));
+    }
+  }
+
+  function buildGroupTable(quarter, group, structure, expandedSet, columnKeys = COLUMN_KEYS) {
+    const rows = [];
+    structure.forEach(line => renderLine(quarter, group, line, 0, expandedSet, rows, columnKeys));
+    return `<table><thead><tr><th></th>${columnKeys.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  }
+
+  function buildHeadlineCard(quarter) {
+    const income = sumStructure(quarter, 'income', INCOME_STRUCTURE);
+    const expenditure = sumStructure(quarter, 'expenditure', EXPENDITURE_STRUCTURE);
+    const beforeDep = emptyFigures();
+    COLUMN_KEYS.forEach(k => { beforeDep[k] = income[k] - expenditure[k]; });
+    const row = (label, figures, opts={}) => `<tr class="data-row" ${opts.underline ? 'style="border-top:1px solid rgba(255,255,255,0.4);"' : ''}>
+      <td style="font-weight:700;${opts.underline ? 'text-decoration:underline;' : ''}">${label}</td>
+      ${COLUMN_KEYS.map(k => `<td>${fmtCell(figures[k])}</td>`).join('')}
+    </tr>`;
+    const rows = [
+      row('Total Income', income, { underline:true }),
+      row('Total Expenditure', expenditure, { underline:true }),
+      row('Surplus / deficit before depreciation', beforeDep),
+    ].join('');
+    return `<div class="section-card"><div class="section-heading">Summary</div>
+      <table><thead><tr><th></th>${COLUMN_KEYS.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  function buildDepreciationCard(quarter) {
+    const income = sumStructure(quarter, 'income', INCOME_STRUCTURE);
+    const expenditure = sumStructure(quarter, 'expenditure', EXPENDITURE_STRUCTURE);
+    const beforeDep = emptyFigures();
+    const afterDep = emptyFigures();
+    COLUMN_KEYS.forEach(k => {
+      beforeDep[k] = income[k] - expenditure[k];
+      afterDep[k] = beforeDep[k] - (quarter.depreciation ? quarter.depreciation[k] || 0 : 0);
+    });
+    const row = (label, figures, opts={}) => `<tr class="data-row" ${opts.underline ? 'style="border-top:1px solid rgba(255,255,255,0.4);"' : ''}>
+      <td style="font-weight:700;${opts.underline ? 'text-decoration:underline;' : ''}">${label}</td>
+      ${COLUMN_KEYS.map(k => `<td>${fmtCell(figures[k])}</td>`).join('')}
+    </tr>`;
+    const rows = [
+      row('Depreciation', quarter.depreciation || emptyFigures()),
+      row('Surplus / deficit', afterDep, { underline:true }),
+    ].join('');
+    return `<div class="section-card"><div class="section-heading">Depreciation</div>
+      <table><thead><tr><th></th>${COLUMN_KEYS.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  function bsFigures(quarter, group, field) {
+    const bs = quarter.balanceSheet || {};
+    return (bs[group] && bs[group][field]) || emptyFigures(BS_COLUMN_KEYS);
+  }
+
+  function bsComputeTotal(quarter, group, line) {
+    if (line.children) {
+      const total = emptyFigures(BS_COLUMN_KEYS);
+      line.children.forEach(child => {
+        const childTotal = bsComputeTotal(quarter, group, child);
+        BS_COLUMN_KEYS.forEach(k => total[k] += childTotal[k]);
+      });
+      return total;
+    }
+    return bsFigures(quarter, group, line.field);
+  }
+
+  function bsSumStructure(quarter, group, structure) {
+    const total = emptyFigures(BS_COLUMN_KEYS);
+    structure.forEach(line => {
+      const t = bsComputeTotal(quarter, group, line);
+      BS_COLUMN_KEYS.forEach(k => total[k] += t[k]);
+    });
+    return total;
+  }
+
+  function bsRow(label, figures, opts={}) {
+    return `<tr class="data-row" ${opts.underline ? 'style="border-top:1px solid rgba(255,255,255,0.4);"' : ''}>
+      <td style="font-weight:700;${opts.underline ? 'text-decoration:underline;' : ''}">${label}</td>
+      ${BS_COLUMN_KEYS.map(k => `<td>${fmtCell(figures[k])}</td>`).join('')}
+    </tr>`;
+  }
+
+  function bsTableWrapper(heading, rowsHtml) {
+    return `<div class="section-card"><div class="section-heading">${heading}</div>
+      <table><thead><tr><th></th>${BS_COLUMN_KEYS.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+  }
+
+  function buildBalanceSheetCards(quarter) {
+    const fixedAssets = bsSumStructure(quarter, 'fixedAssets', FIXED_ASSETS_STRUCTURE);
+    const currentAssets = bsSumStructure(quarter, 'currentAssets', CURRENT_ASSETS_STRUCTURE);
+    const netAssets = emptyFigures(BS_COLUMN_KEYS);
+    BS_COLUMN_KEYS.forEach(k => { netAssets[k] = fixedAssets[k] + currentAssets[k]; });
+
+    const fixedRows = FIXED_ASSETS_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'fixedAssets', line))).join('')
+      + bsRow('TOTAL FIXED ASSETS', fixedAssets, { underline:true });
+    const currentRows = CURRENT_ASSETS_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'currentAssets', line))).join('')
+      + bsRow('NET CURRENT ASSETS', currentAssets, { underline:true });
+    const netAssetsCard = bsTableWrapper('Net Assets', bsRow('NET ASSETS', netAssets, { underline:true }));
+
+    return bsTableWrapper('Fixed Assets', fixedRows)
+      + bsTableWrapper('Current Assets', currentRows)
+      + netAssetsCard;
+  }
+
+  function buildReservesCards(quarter) {
+    const unrestricted = bsSumStructure(quarter, 'unrestrictedReserves', UNRESTRICTED_RESERVES_STRUCTURE);
+    const designated = bsSumStructure(quarter, 'designatedFutureFund', DESIGNATED_FUTURE_FUND_STRUCTURE);
+    const netAssets = emptyFigures(BS_COLUMN_KEYS);
+    BS_COLUMN_KEYS.forEach(k => { netAssets[k] = unrestricted[k] + designated[k]; });
+
+    const unrestrictedRows = UNRESTRICTED_RESERVES_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'unrestrictedReserves', line))).join('')
+      + bsRow('', unrestricted, { underline:true });
+    const designatedRows = DESIGNATED_FUTURE_FUND_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'designatedFutureFund', line))).join('')
+      + bsRow('', designated, { underline:true });
+    const netAssetsCard = bsTableWrapper('Net Assets', bsRow('NET ASSETS', netAssets, { underline:true }));
+
+    return bsTableWrapper('Unrestricted Reserves', unrestrictedRows)
+      + bsTableWrapper('Designated Future Fund', designatedRows)
+      + netAssetsCard;
+  }
+
+  let financeExpanded = { income: new Set(), expenditure: new Set() };
+
+  function buildIncomeExpenditureCards(quarter) {
+    const incomeTable = buildGroupTable(quarter, 'income', INCOME_STRUCTURE, financeExpanded.income);
+    const expenditureTable = buildGroupTable(quarter, 'expenditure', EXPENDITURE_STRUCTURE, financeExpanded.expenditure);
+    return `<div class="section-card"><div class="section-heading">Income</div>${incomeTable}</div>
+      <div class="section-card"><div class="section-heading">Expenditure</div>${expenditureTable}</div>`;
+  }
+
+  document.getElementById('detail-content').addEventListener('click', e => {
+    const toggle = e.target.closest('[data-toggle-label]');
+    if (!toggle || !currentFinanceQuarter) return;
+    const label = decodeURIComponent(toggle.dataset.toggleLabel);
+    const inIncome = INCOME_STRUCTURE.some(l => l.label === label);
+    const group = inIncome ? 'income' : 'expenditure';
+    const set = financeExpanded[group];
+    if (set.has(label)) set.delete(label); else set.add(label);
+    showFinanceDetail(currentFinanceQuarter.id, true);
+  });
+
+  function hasActuals(q) {
+    const income = sumStructure(q, 'income', INCOME_STRUCTURE);
+    return income.actual !== 0;
+  }
+
+  function showFinanceDetail(id, isToggleRefresh) {
+    const quarter = allQuarters.find(q => q.id === id);
+    if (!quarter) return;
+    currentFinanceQuarter = quarter;
+    const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
+    const scrollPos = isToggleRefresh ? window.scrollY : 0;
+    const headline = buildHeadlineCard(quarter);
+    const incomeExpenditure = buildIncomeExpenditureCards(quarter);
+    const depreciationCard = buildDepreciationCard(quarter);
+    const notes = quarter.notes ? `<div class="notes-card"><div class="notes-label">Notes</div><div class="notes-text">${quarter.notes}</div></div>` : '';
+    const charts = hasActuals(quarter) ? `<div class="chart-buttons">
+      <button class="chart-btn" onclick="window._showChart('income')">Income breakdown</button>
+      <button class="chart-btn" onclick="window._showChart('expenditure')">Expenditure breakdown</button>
+    </div>` : '';
+    document.getElementById('detail-content').innerHTML = headline + incomeExpenditure + depreciationCard + notes + charts;
+    document.getElementById('list-view').style.display = 'none';
+    document.getElementById('detail-view').style.display = 'block';
+    document.getElementById('chart-view').style.display = 'none';
+    document.getElementById('detail-title').textContent = label;
+    if (isToggleRefresh) {
+      window.scrollTo(0, scrollPos);
+    } else {
+      financeExpanded.income.clear();
+      financeExpanded.expenditure.clear();
+      window.scrollTo(0,0);
+    }
+  }
+
+  document.getElementById('back-to-list').addEventListener('click', () => {
+    document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('list-view').style.display = 'block';
+    window.scrollTo(0,0);
+  });
+  document.getElementById('back-to-detail').addEventListener('click', () => {
+    document.getElementById('chart-view').style.display = 'none';
+    document.getElementById('detail-view').style.display = 'block';
+    window.scrollTo(0,0);
+  });
+
+  function showBalanceDetail(id) {
+    const quarter = allQuarters.find(q => q.id === id);
+    if (!quarter) return;
+    const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
+    const balanceSheetCards = buildBalanceSheetCards(quarter);
+    const reservesCards = buildReservesCards(quarter);
+    document.getElementById('balance-detail-content').innerHTML = balanceSheetCards
+      + '<div class="section-heading-dark" style="margin-top:8px;">Reserves Reconciliation</div>'
+      + reservesCards;
+    document.getElementById('balance-list-view').style.display = 'none';
+    document.getElementById('balance-detail-view').style.display = 'block';
+    document.getElementById('balance-detail-title').textContent = label;
+    window.scrollTo(0,0);
+  }
+
+  document.getElementById('balance-back-to-list').addEventListener('click', () => {
+    document.getElementById('balance-detail-view').style.display = 'none';
+    document.getElementById('balance-list-view').style.display = 'block';
+    window.scrollTo(0,0);
+  });
+
+  const CHART_COLOURS = ['#2979FF','#FF6D00','#2EC4B6','#FFD166','#8338EC','#FF4081','#00BFA5','#FFAB00'];
+
+  function topLevelSlices(quarter, group, structure) {
+    return structure.map(line => ({
+      label: line.label,
+      value: computeTotal(quarter, group, line).actual
+    })).filter(s => s.value > 0);
+  }
+
+  window._showChart = function(type) {
+    const quarter = currentFinanceQuarter;
+    if (!quarter) return;
+    const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
+    let title, slicesData;
+    if (type === 'income') {
+      title = 'Income breakdown';
+      slicesData = topLevelSlices(quarter, 'income', INCOME_STRUCTURE);
+    } else {
+      title = 'Expenditure breakdown';
+      slicesData = topLevelSlices(quarter, 'expenditure', EXPENDITURE_STRUCTURE);
+    }
+    const slices = slicesData.map((s,i) => ({ l:s.label, v:s.value, c:CHART_COLOURS[i % CHART_COLOURS.length] }));
+    if (currentChart) { currentChart.destroy(); currentChart = null; }
+    document.getElementById('chart-month-title').textContent = label;
+    document.getElementById('chart-title').textContent = title;
+    document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('chart-view').style.display = 'block';
+    const ctx = document.getElementById('myChart');
+    currentChart = new Chart(ctx, {
+      type:'pie',
+      data:{ labels:slices.map(s=>s.l), datasets:[{ data:slices.map(s=>s.v), backgroundColor:slices.map(s=>s.c), borderColor:'#1a56cc', borderWidth:2 }] },
+      options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'white', padding:16, font:{size:13} } },
+        tooltip:{ callbacks:{ label(ctx){ const v=ctx.parsed,t=ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${new Intl.NumberFormat('en-GB').format(v)} (${((v/t)*100).toFixed(1)}%)`; } } } } }
+    });
+    window.scrollTo(0,0);
+  };
+
+  // ── MEETINGS (Board / FC / Fundraising — unchanged) ────────────────────────
+
+  const COMMITTEE_COLLECTIONS = {
+    board:       { meetings:'board-meetings',       agenda:'board-agenda',       minutes:'board-minutes',       actions:'board-actions',       comments:'board-comments' },
+    fc:          { meetings:'fc-meetings',           agenda:'fc-agenda',          minutes:'fc-minutes',          actions:'fc-actions',          comments:'fc-comments' },
+    fundraising: { meetings:'fundraising-meetings',  agenda:'fundraising-agenda', minutes:'fundraising-minutes', actions:'fundraising-actions', comments:'fundraising-comments' },
+  };
+
+  function formatDate(ts) {
+    if (!ts) return '';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+  }
+
+  async function loadMeetings(prefix) {
+    const col = COMMITTEE_COLLECTIONS[prefix].meetings;
+    const listEl = document.getElementById(prefix + '-meetings-list');
+    listEl.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(query(collection(db, col), orderBy('meetingDate','desc')));
+      if (snap.empty) { listEl.innerHTML = '<p class="empty-state">No meetings yet.</p>'; return; }
+      listEl.innerHTML = '';
+      snap.forEach(d => {
+        const m = d.data();
+        const row = document.createElement('div');
+        row.className = 'meeting-row';
+        row.innerHTML = `<div><div class="meeting-row-title">${m.title}</div><div class="meeting-row-date">${m.meetingDate}</div></div>
+          <div class="meeting-badges">
+            ${m.hasAgenda ? '<span class="mbadge mbadge-agenda">Papers</span>' : ''}
+            ${m.hasMinutes ? '<span class="mbadge mbadge-minutes">Minutes</span>' : ''}
+          </div>`;
+        row.addEventListener('click', () => openMeeting(prefix, d.id));
+        listEl.appendChild(row);
+      });
+    } catch(e) { console.error(e); listEl.innerHTML = '<p class="empty-state">Error loading meetings.</p>'; }
+  }
+
+  ['board','fc','fundraising'].forEach(prefix => {
+    document.getElementById(prefix + '-add-meeting-btn').addEventListener('click', () => {
+      document.getElementById(prefix + '-meetings-list-view').style.display = 'none';
+      document.getElementById(prefix + '-add-meeting-form').style.display = 'block';
+    });
+    document.getElementById(prefix + '-cancel-meeting-btn').addEventListener('click', () => {
+      document.getElementById(prefix + '-add-meeting-form').style.display = 'none';
+      document.getElementById(prefix + '-meetings-list-view').style.display = 'block';
+    });
+    document.getElementById(prefix + '-save-meeting-btn').addEventListener('click', async () => {
+      const title = document.getElementById(prefix + '-meeting-title').value.trim();
+      const date  = document.getElementById(prefix + '-meeting-date').value;
+      if (!title || !date) return;
+      const col = COMMITTEE_COLLECTIONS[prefix].meetings;
+      await addDoc(collection(db, col), { title, meetingDate:date, hasAgenda:false, hasMinutes:false, createdBy:currentUser.email, createdAt:serverTimestamp() });
+      document.getElementById(prefix + '-meeting-title').value = '';
+      document.getElementById(prefix + '-meeting-date').value = '';
+      document.getElementById(prefix + '-add-meeting-form').style.display = 'none';
+      document.getElementById(prefix + '-meetings-list-view').style.display = 'block';
+      loadMeetings(prefix);
+    });
+    document.getElementById(prefix + '-back-to-meetings').addEventListener('click', () => {
+      document.getElementById(prefix + '-meeting-detail').style.display = 'none';
+      document.getElementById(prefix + '-meetings-list-view').style.display = 'block';
+      loadMeetings(prefix);
+    });
+  });
+
+  async function openMeeting(prefix, id) {
+    currentMeetingId[prefix] = id;
+    const col = COMMITTEE_COLLECTIONS[prefix].meetings;
+    const snap = await getDoc(doc(db, col, id));
+    const m = snap.data();
+    document.getElementById(prefix + '-meetings-list-view').style.display = 'none';
+    document.getElementById(prefix + '-meeting-detail').style.display = 'block';
+    document.getElementById(prefix + '-meeting-detail-title').textContent = m.title;
+    document.getElementById(prefix + '-meeting-detail-date').textContent = m.meetingDate;
+    const detail = document.getElementById(prefix + '-meeting-detail');
+    detail.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    detail.querySelectorAll('.sub-panel').forEach(p => { p.style.display='none'; p.classList.remove('active'); });
+    detail.querySelector('[data-subtab="' + prefix + '-panel-papers"]').classList.add('active');
+    document.getElementById(prefix + '-panel-papers').style.display = 'block';
+    document.getElementById(prefix + '-panel-papers').classList.add('active');
+    const canPost = prefix === 'board'
+      ? (isCEO() || currentUserData?.chairBoard || currentUserData?.chairFC || currentUserData?.chairFundraising)
+      : canPostForCommittee(prefix);
+    document.getElementById(prefix + '-papers-compose').style.display  = canPost ? 'block' : 'none';
+    document.getElementById(prefix + '-minutes-compose').style.display = canPost ? 'block' : 'none';
+    document.getElementById(prefix + '-actions-compose').style.display = canPost ? 'block' : 'none';
+    setupDropzone(prefix + '-papers-dropzone', prefix + '-papers-file', prefix + '-papers-selected');
+    setupDropzone(prefix + '-minutes-dropzone', prefix + '-minutes-file', prefix + '-minutes-selected');
+    loadPapers(prefix);
+    loadMinutes(prefix);
+  }
+
+  // ── DRAG AND DROP SETUP (shared by all upload zones, incl. groups) ────────
+
+  function setupDropzone(dropzoneId, fileInputId, selectedId) {
+    const dropzone = document.getElementById(dropzoneId);
+    const fileInput = document.getElementById(fileInputId);
+    const selectedEl = document.getElementById(selectedId);
+    if (!dropzone || !fileInput) return;
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) {
+        selectedEl.textContent = '📎 ' + fileInput.files[0].name;
+        dropzone.style.borderColor = '#2979FF';
+      }
+    });
+
+    dropzone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#2979FF';
+      dropzone.style.background = '#eff6ff';
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.style.borderColor = '#cbd5e1';
+      dropzone.style.background = '#f8fafc';
+    });
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#cbd5e1';
+      dropzone.style.background = '#f8fafc';
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        selectedEl.textContent = '📎 ' + file.name;
+        dropzone.style.borderColor = '#2979FF';
+      }
+    });
+  }
+
+  async function loadPapers(prefix) {
+    const el = document.getElementById(prefix + '-papers-content');
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    const col = COMMITTEE_COLLECTIONS[prefix].agenda;
+    try {
+      const snap = await getDocs(query(collection(db, col), where('meetingId','==',currentMeetingId[prefix]), orderBy('createdAt','asc')));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No papers uploaded yet.</p>'; return; }
+      el.innerHTML = '';
+      snap.forEach(d => {
+        const a = d.data();
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.marginBottom = '10px';
+        const fileIcon = a.fileName?.endsWith('.pdf') ? '📄' : (a.fileName?.endsWith('.pptx') || a.fileName?.endsWith('.ppt')) ? '📊' : '📝';
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+            <div style="min-width:0;">
+              <div style="font-weight:600;margin-bottom:2px;">${fileIcon} ${a.description || 'Document'}</div>
+              <div style="font-size:13px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.fileName || ''}</div>
+              <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Uploaded by ${a.authorEmail} · ${formatDate(a.createdAt)}</div>
+            </div>
+            <a href="${a.downloadURL}" target="_blank" class="btn btn-sm" style="text-decoration:none;white-space:nowrap;flex-shrink:0;" onclick="downloadFile('${a.downloadURL}', '${a.fileName}'); return false;">⬇ Download</a>
+          </div>`;
+        el.appendChild(div);
+      });
+    } catch(e) { console.error(e); }
+  }
+
+  ['board','fc','fundraising'].forEach(prefix => {
+    document.getElementById(prefix + '-post-papers-btn').addEventListener('click', async () => {
+      const fileInput  = document.getElementById(prefix + '-papers-file');
+      const descInput  = document.getElementById(prefix + '-papers-desc');
+      const progressEl = document.getElementById(prefix + '-papers-upload-progress');
+      const selectedEl = document.getElementById(prefix + '-papers-selected');
+      const file = fileInput.files[0];
+      if (!file) { alert('Please select a file to upload.'); return; }
+      const description = descInput.value.trim() || file.name;
+      const col = COMMITTEE_COLLECTIONS[prefix];
+      const storagePath = `${prefix}/meetings/${currentMeetingId[prefix]}/papers/${Date.now()}_${file.name}`;
+      try {
+        await uploadDocument(storagePath, file, col.agenda,
+          { meetingId: currentMeetingId[prefix], description },
+          progressEl
+        );
+        await updateDoc(doc(db, col.meetings, currentMeetingId[prefix]), { hasAgenda: true });
+        fileInput.value = '';
+        descInput.value = '';
+        selectedEl.textContent = '';
+        document.getElementById(prefix + '-papers-dropzone').style.borderColor = '#cbd5e1';
+        loadPapers(prefix);
+      } catch(e) { console.error(e); }
+    });
+  });
+
+  ['board','fc','fundraising'].forEach(prefix => {
+    document.getElementById(prefix + '-post-minutes-btn').addEventListener('click', async () => {
+      const fileInput  = document.getElementById(prefix + '-minutes-file');
+      const progressEl = document.getElementById(prefix + '-minutes-upload-progress');
+      const selectedEl = document.getElementById(prefix + '-minutes-selected');
+      const file = fileInput.files[0];
+      if (!file) { alert('Please select a file to upload.'); return; }
+      const col = COMMITTEE_COLLECTIONS[prefix];
+      const storagePath = `${prefix}/meetings/${currentMeetingId[prefix]}/minutes/minutes${file.name.substring(file.name.lastIndexOf('.'))}`;
+      try {
+        await uploadDocument(storagePath, file, col.minutes,
+          { meetingId: currentMeetingId[prefix], description: 'Minutes' },
+          progressEl
+        );
+        await updateDoc(doc(db, col.meetings, currentMeetingId[prefix]), { hasMinutes: true });
+        fileInput.value = '';
+        selectedEl.textContent = '';
+        document.getElementById(prefix + '-minutes-dropzone').style.borderColor = '#cbd5e1';
+        loadMinutes(prefix);
+      } catch(e) { console.error(e); }
+    });
+  });
+
+  /*
+    Generic upload helper — used by Board/FC/Fundraising papers+minutes
+    AND by the new Groups document library. Uploads to Storage, then
+    writes a metadata record to the given Firestore collection.
+  */
+  async function uploadDocument(storagePath, file, firestoreCol, extraData, progressEl) {
+    progressEl.style.display = 'block';
+    progressEl.textContent = 'Uploading...';
+
+    const storageRef = ref(storage, storagePath);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on('state_changed',
+        snapshot => {
+          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          progressEl.textContent = `Uploading... ${pct}%`;
+        },
+        error => {
+          progressEl.textContent = 'Upload failed. Please try again.';
+          console.error(error);
+          reject(error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          await addDoc(collection(db, firestoreCol), {
+            ...extraData,
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+            downloadURL,
+            authorEmail: currentUser.email,
+            createdAt: serverTimestamp()
+          });
+          progressEl.style.display = 'none';
+          resolve(downloadURL);
+        }
+      );
+    });
+  }
+
+  async function loadMinutes(prefix) {
+    const el = document.getElementById(prefix + '-minutes-content');
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    const col = COMMITTEE_COLLECTIONS[prefix].minutes;
+    try {
+      const snap = await getDocs(query(collection(db, col), where('meetingId','==',currentMeetingId[prefix]), orderBy('createdAt','desc')));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No minutes uploaded yet.</p>'; return; }
+      el.innerHTML = '';
+      snap.forEach(d => {
+        const m = d.data();
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.marginBottom = '10px';
+        const fileIcon = m.fileName?.endsWith('.pdf') ? '📄' : m.fileName?.endsWith('.pptx') || m.fileName?.endsWith('.ppt') ? '📊' : '📝';
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-weight:600;margin-bottom:4px;">${fileIcon} Minutes</div>
+              <div style="font-size:13px;color:#64748b;">${m.fileName || 'Document'}</div>
+              <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Uploaded by ${m.authorEmail} · ${formatDate(m.createdAt)}</div>
+            </div>
+            <a href="${m.downloadURL}" target="_blank" class="btn btn-sm" style="text-decoration:none;white-space:nowrap;" onclick="downloadFile('${m.downloadURL}', '${m.fileName}'); return false;">⬇ Download</a>
+          </div>`;
+        el.appendChild(div);
+      });
+    } catch(e) { console.error(e); }
+  }
+
+  // ── ACTIONS (Board / FC / Fundraising — unchanged) ──────────────────────────
+
+  async function loadMeetingActions(prefix) {
+    const el = document.getElementById(prefix + '-meeting-actions-list');
+    el.innerHTML = '';
+    const col = COMMITTEE_COLLECTIONS[prefix].actions;
+    try {
+      const snap = await getDocs(query(collection(db, col), where('meetingId','==',currentMeetingId[prefix]), orderBy('createdAt','asc')));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No actions from this meeting yet.</p>'; return; }
+      snap.forEach(d => el.appendChild(renderAction(d, prefix, () => loadMeetingActions(prefix))));
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadCarriedActions(prefix) {
+    const el = document.getElementById(prefix + '-carried-list');
+    el.innerHTML = '';
+    const col = COMMITTEE_COLLECTIONS[prefix].actions;
+    try {
+      const snap = await getDocs(query(collection(db, col), where('signedOff','!=',true), orderBy('signedOff'), orderBy('meetingDate','asc')));
+      const carried = snap.docs.filter(d => d.data().meetingId !== currentMeetingId[prefix]);
+      if (carried.length === 0) { el.innerHTML = '<p class="empty-state">No carried over actions.</p>'; return; }
+      carried.forEach(d => el.appendChild(renderAction(d, prefix, () => loadCarriedActions(prefix))));
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadOutstandingActions(prefix, filter = 'all') {
+    const el = document.getElementById(prefix + '-outstanding-list');
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    const col = COMMITTEE_COLLECTIONS[prefix].actions;
+    try {
+      const snap = await getDocs(query(collection(db, col), where('signedOff','!=',true), orderBy('signedOff'), orderBy('meetingDate','asc')));
+      let docs = snap.docs;
+      if (filter !== 'all') docs = docs.filter(d => d.data().status === filter);
+      if (docs.length === 0) { el.innerHTML = '<p class="empty-state">No outstanding actions.</p>'; return; }
+      el.innerHTML = '';
+      docs.forEach(d => el.appendChild(renderAction(d, prefix, () => loadOutstandingActions(prefix, filter))));
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadAllActions(prefix, filter = 'all') {
+    const el = document.getElementById(prefix + '-all-list');
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    const col = COMMITTEE_COLLECTIONS[prefix].actions;
+    try {
+      const snap = await getDocs(query(collection(db, col), orderBy('meetingDate','desc')));
+      let docs = snap.docs;
+      if (filter === 'open')      docs = docs.filter(d => !d.data().signedOff && d.data().status !== 'Completed');
+      if (filter === 'completed') docs = docs.filter(d => d.data().signedOff === true);
+      if (docs.length === 0) { el.innerHTML = '<p class="empty-state">No actions found.</p>'; return; }
+      el.innerHTML = '';
+      docs.forEach(d => el.appendChild(renderAction(d, prefix, () => loadAllActions(prefix, filter))));
+    } catch(e) { console.error(e); }
+  }
+
+  ['board','fc','fundraising'].forEach(prefix => {
+    document.querySelectorAll(`#${prefix}-tab-outstanding .filter-btn`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll(`#${prefix}-tab-outstanding .filter-btn`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadOutstandingActions(prefix, btn.dataset.filter);
+      });
+    });
+    document.querySelectorAll(`#${prefix}-tab-all .filter-btn`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll(`#${prefix}-tab-all .filter-btn`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadAllActions(prefix, btn.dataset.filter);
+      });
+    });
+  });
+
+  ['board','fc','fundraising'].forEach(prefix => {
+    document.getElementById(prefix + '-post-action-btn').addEventListener('click', async () => {
+      const title = document.getElementById(prefix + '-action-title').value.trim();
+      if (!title) return;
+      const col = COMMITTEE_COLLECTIONS[prefix].actions;
+      await addDoc(collection(db, col), {
+        meetingId:    currentMeetingId[prefix],
+        title,
+        assignedTo:   document.getElementById(prefix + '-action-assigned').value,
+        targetDate:   document.getElementById(prefix + '-action-target').value,
+        status:       document.getElementById(prefix + '-action-status').value,
+        description:  document.getElementById(prefix + '-action-desc').value.trim(),
+        staffVisible: document.getElementById(prefix + '-action-staff-visible').checked,
+        meetingDate:  document.getElementById(prefix + '-meeting-detail-date').textContent,
+        signedOff:    false,
+        committee:    prefix,
+        createdBy:    currentUser.email,
+        createdAt:    serverTimestamp()
+      });
+      document.getElementById(prefix + '-action-title').value = '';
+      document.getElementById(prefix + '-action-desc').value = '';
+      document.getElementById(prefix + '-action-target').value = '';
+      document.getElementById(prefix + '-action-staff-visible').checked = false;
+      loadMeetingActions(prefix);
+    });
+  });
+
+  function renderAction(docSnap, prefix, reloadFn) {
+    const a = docSnap.data();
+    const id = docSnap.id;
+    const col = COMMITTEE_COLLECTIONS[prefix].actions;
+    const statusClass = a.signedOff ? 'status-signeoff' : (a.status === 'Open' ? 'status-open' : a.status === 'In Progress' ? 'status-inprogress' : 'status-completed');
+    const canSO = canSignOff();
+
+    const div = document.createElement('div');
+    div.className = 'action-card';
+    div.innerHTML = `
+      <div class="action-title">${a.title}</div>
+      <div class="action-meta">Assigned to: ${a.assignedTo || '—'} · Target: ${a.targetDate || '—'} · From: ${a.meetingDate || '—'}</div>
+      ${a.description ? `<div class="action-desc">${a.description}</div>` : ''}
+      <div class="action-footer">
+        <span class="status-badge ${statusClass}">${a.signedOff ? '✓ Signed Off' : a.status}</span>
+        ${!a.signedOff ? `<select class="action-status-select" style="padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid #e2e8f0;width:auto;">
+          <option value="Open" ${a.status==='Open'?'selected':''}>Open</option>
+          <option value="In Progress" ${a.status==='In Progress'?'selected':''}>In Progress</option>
+          <option value="Completed" ${a.status==='Completed'?'selected':''}>Completed</option>
+        </select>` : ''}
+        ${canSO && !a.signedOff ? `<button class="btn btn-sm sign-off-btn" style="background:#166534;color:#fff;">Sign Off</button>` : ''}
+        ${canSO && a.signedOff  ? `<button class="btn btn-sm btn-secondary unsign-btn">Unsign</button>` : ''}
+        ${a.staffVisible ? '<span style="font-size:11px;color:#64748b;">👁 Staff visible</span>' : ''}
+      </div>
+      <div style="margin-top:10px;">
+        <div id="comments-${id}" style="margin-bottom:8px;"></div>
+        <div style="display:flex;gap:8px;margin-top:6px;">
+          <input type="text" class="action-comment-input" placeholder="Add a comment..." style="flex:1;padding:6px 10px;font-size:13px;">
+          <button class="btn btn-sm post-action-comment" data-id="${id}">Post</button>
+        </div>
+      </div>`;
+
+    loadActionComments(prefix, id);
+
+    div.querySelector('.action-status-select')?.addEventListener('change', async e => {
+      await updateDoc(doc(db, col, id), { status: e.target.value });
+      reloadFn();
+    });
+    div.querySelector('.sign-off-btn')?.addEventListener('click', async () => {
+      await updateDoc(doc(db, col, id), { signedOff:true, signedOffBy:currentUser.email, signedOffAt:serverTimestamp() });
+      reloadFn();
+    });
+    div.querySelector('.unsign-btn')?.addEventListener('click', async () => {
+      await updateDoc(doc(db, col, id), { signedOff:false, signedOffBy:null, signedOffAt:null });
+      reloadFn();
+    });
+    div.querySelector('.post-action-comment').addEventListener('click', async () => {
+      const input = div.querySelector('.action-comment-input');
+      const text = input.value.trim();
+      if (!text) return;
+      const commentCol = COMMITTEE_COLLECTIONS[prefix].comments;
+      await addDoc(collection(db, commentCol), { actionId:id, text, authorEmail:currentUser.email, createdAt:serverTimestamp() });
+      input.value = '';
+      loadActionComments(prefix, id);
+    });
+
+    return div;
+  }
+
+  async function loadActionComments(prefix, actionId) {
+    const el = document.getElementById('comments-' + actionId);
+    if (!el) return;
+    const col = COMMITTEE_COLLECTIONS[prefix].comments;
+    try {
+      const snap = await getDocs(query(collection(db, col), where('actionId','==',actionId), orderBy('createdAt','asc')));
+      el.innerHTML = '';
+      snap.forEach(d => {
+        const c = d.data();
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        div.innerHTML = `<div class="comment-meta">${c.authorEmail} · ${formatDate(c.createdAt)}</div><div class="comment-text">${c.text}</div>`;
+        el.appendChild(div);
+      });
+    } catch(e) {}
+  }
+
+
+  // ════════════════════════════════════════════════════════════════════════
+  // ── GROUPS ENGINE (new) ───────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
+  //
+  // A "group" is a generic container: standing committee sections
+  // (Finances, Membership, Team Results, Agendas & Minutes, Discussion),
+  // sub-committees (e.g. Resurfacing), and events (e.g. AGM). Each has
+  // a document list and, optionally, a discussion thread.
+  //
+  // The five standing fixtures are created once via ensureFixtureGroups()
+  // below, which runs harmlessly every time the app loads — it only
+  // creates a fixture if one with that exact name doesn't already exist.
+
+  const FIXTURE_GROUPS = [
+    { name: 'Finances',          hasDiscussion: false, hasMeetings: false, isPlaceholder: false },
+    { name: 'Membership',        hasDiscussion: false, hasMeetings: false, isPlaceholder: false },
+    { name: 'Team Results',      hasDiscussion: false, hasMeetings: false, isPlaceholder: false },
+    { name: 'Agendas & Minutes', hasDiscussion: false, hasMeetings: false, isPlaceholder: true  },
+    { name: 'Discussion',        hasDiscussion: true,  hasMeetings: false, isPlaceholder: false },
+  ];
+
+  let allGroups = [];          // cached list of {id, ...data}
+  let currentGroupId = null;
+  let currentGroupData = null;
+  let currentTopicId = null;
+
+  async function ensureFixtureGroups() {
+    if (!isAdmin()) return; // only an admin/superadmin session can create them
+    try {
+      const snap = await getDocs(collection(db, 'groups'));
+      const existingNames = new Set(snap.docs.map(d => d.data().name));
+      for (const fx of FIXTURE_GROUPS) {
+        if (!existingNames.has(fx.name)) {
+          await addDoc(collection(db, 'groups'), {
+            name: fx.name,
+            type: 'standing',
+            isFixture: true,
+            isPlaceholder: fx.isPlaceholder,
+            visibleToAllCommittee: true,
+            memberUids: [],
+            hasDiscussion: fx.hasDiscussion,
+            hasMeetings: fx.hasMeetings,
+            createdBy: currentUser.email,
+            createdAt: serverTimestamp()
+          });
+        }
+      }
+    } catch(e) { console.error('Could not verify/create fixture groups', e); }
+  }
+
+  async function loadGroups() {
+    await ensureFixtureGroups();
+    try {
+      const snap = await getDocs(query(collection(db, 'groups'), orderBy('createdAt','asc')));
+      allGroups = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(g => g.visibleToAllCommittee || (g.memberUids || []).includes(currentUser.uid));
+      renderGroupsList();
+    } catch(e) {
+      console.error(e);
+      document.getElementById('groups-standing-list').innerHTML = '<p class="empty-state">Error loading groups.</p>';
+    }
+  }
+
+  function renderGroupsList() {
+    const standing = allGroups.filter(g => g.type === 'standing');
+    const other = allGroups.filter(g => g.type !== 'standing');
+
+    const standingEl = document.getElementById('groups-standing-list');
+    standingEl.innerHTML = '';
+    if (standing.length === 0) {
+      standingEl.innerHTML = '<p class="empty-state">No groups yet.</p>';
+    } else {
+      standing.forEach(g => standingEl.appendChild(renderGroupCard(g)));
+    }
+
+    const otherSection = document.getElementById('groups-other-section');
+    const otherEl = document.getElementById('groups-other-list');
+    if (other.length === 0) {
+      otherSection.style.display = 'none';
+    } else {
+      otherSection.style.display = 'block';
+      otherEl.innerHTML = '';
+      other.forEach(g => otherEl.appendChild(renderGroupCard(g)));
+    }
+  }
+
+  function renderGroupCard(g) {
+    const div = document.createElement('div');
+    div.className = 'group-card';
+    const typeClass = g.type === 'standing' ? 'group-type-standing' : g.type === 'event' ? 'group-type-event' : 'group-type-subcommittee';
+    const typeLabel = g.type === 'standing' ? 'Standing' : g.type === 'event' ? 'Event' : 'Sub-committee';
+    const memberCount = g.visibleToAllCommittee ? 'All committee members' : `${(g.memberUids || []).length} member${(g.memberUids||[]).length === 1 ? '' : 's'}`;
+    div.innerHTML = `
+      <div>
+        <div class="group-card-title">${g.name}</div>
+        <div class="group-card-meta">${memberCount}${g.hasDiscussion ? ' · Discussion' : ''}</div>
+      </div>
+      <span class="group-type-badge ${typeClass}">${typeLabel}</span>`;
+    div.addEventListener('click', () => openGroup(g.id));
+    return div;
+  }
+
+  // ── NEW GROUP FORM ──────────────────────────────────────────────────────
+
+  document.getElementById('groups-new-group-btn').addEventListener('click', async () => {
+    document.getElementById('groups-list-view').style.display = 'none';
+    document.getElementById('groups-new-group-form').style.display = 'block';
+    await populateMemberPicker();
+  });
+
+  document.getElementById('ng-cancel-btn').addEventListener('click', () => {
+    document.getElementById('groups-new-group-form').style.display = 'none';
+    document.getElementById('groups-list-view').style.display = 'block';
+  });
+
+  async function populateMemberPicker() {
+    const picker = document.getElementById('ng-member-picker');
+    picker.innerHTML = '<p class="empty-state">Loading users...</p>';
+    try {
+      if (allUsers.length === 0) {
+        const snap = await getDocs(collection(db, 'users'));
+        allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      picker.innerHTML = '';
+      allUsers.forEach(u => {
+        const label = document.createElement('label');
+        const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || u.id;
+        label.innerHTML = `<input type="checkbox" class="ng-member-cb" value="${u.id}"> ${name}`;
+        picker.appendChild(label);
+      });
+      if (allUsers.length === 0) picker.innerHTML = '<p class="empty-state">No users found.</p>';
+    } catch(e) {
+      console.error(e);
+      picker.innerHTML = '<p class="empty-state">Error loading users.</p>';
+    }
+  }
+
+  document.getElementById('ng-save-btn').addEventListener('click', async () => {
+    const name = document.getElementById('ng-name').value.trim();
+    const type = document.getElementById('ng-type').value;
+    const hasDiscussion = document.getElementById('ng-has-discussion').checked;
+    const errEl = document.getElementById('ng-error');
+    if (!name) { errEl.textContent = 'Please enter a group name.'; return; }
+    const memberUids = [...document.querySelectorAll('.ng-member-cb')]
+      .filter(cb => cb.checked).map(cb => cb.value);
+    // The creator is always included so they can see the group they just made.
+    if (!memberUids.includes(currentUser.uid)) memberUids.push(currentUser.uid);
+    try {
+      await addDoc(collection(db, 'groups'), {
+        name, type,
+        isFixture: false,
+        isPlaceholder: false,
+        visibleToAllCommittee: false,
+        memberUids,
+        hasDiscussion,
+        hasMeetings: false,
+        createdBy: currentUser.email,
+        createdAt: serverTimestamp()
+      });
+      document.getElementById('ng-name').value = '';
+      document.getElementById('ng-has-discussion').checked = true;
+      errEl.textContent = '';
+      document.getElementById('groups-new-group-form').style.display = 'none';
+      document.getElementById('groups-list-view').style.display = 'block';
+      loadGroups();
+    } catch(e) {
+      console.error(e);
+      errEl.textContent = 'Error creating group. Please try again.';
+    }
+  });
+
+  // ── GROUP DETAIL ────────────────────────────────────────────────────────
+
+  document.getElementById('group-back-to-list').addEventListener('click', () => {
+    document.getElementById('group-detail-view').style.display = 'none';
+    document.getElementById('groups-list-view').style.display = 'block';
+    currentGroupId = null;
+    currentGroupData = null;
+  });
+
+  async function openGroup(groupId) {
+    const g = allGroups.find(x => x.id === groupId);
+    if (!g) return;
+    currentGroupId = groupId;
+    currentGroupData = g;
+
+    document.getElementById('groups-list-view').style.display = 'none';
+    document.getElementById('groups-new-group-form').style.display = 'none';
+    document.getElementById('group-detail-view').style.display = 'block';
+    document.getElementById('group-detail-title').textContent = g.name;
+    const typeLabel = g.type === 'standing' ? 'Standing section' : g.type === 'event' ? 'Event' : 'Sub-committee';
+    const memberDesc = g.visibleToAllCommittee ? 'Visible to all committee members' : `${(g.memberUids||[]).length} member${(g.memberUids||[]).length===1?'':'s'}`;
+    document.getElementById('group-detail-meta').textContent = `${typeLabel} · ${memberDesc}`;
+
+    // Reset to Documents tab
+    const tabs = document.getElementById('group-detail-tabs');
+    tabs.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    tabs.querySelector('[data-subtab="group-panel-documents"]').classList.add('active');
+    document.querySelectorAll('#group-detail-view .sub-panel').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+    document.getElementById('group-panel-documents').style.display = 'block';
+    document.getElementById('group-panel-documents').classList.add('active');
+
+    // Show/hide Discussion and Members tabs depending on this group's capabilities
+    document.getElementById('group-discussion-tab-btn').style.display = g.hasDiscussion ? 'inline-block' : 'none';
+    document.getElementById('group-members-tab-btn').style.display = g.visibleToAllCommittee ? 'none' : 'inline-block';
+
+    // Documents panel: placeholder vs active
+    const isPlaceholder = g.isPlaceholder === true;
+    document.getElementById('group-docs-placeholder').style.display = isPlaceholder ? 'block' : 'none';
+    document.getElementById('group-docs-active').style.display = isPlaceholder ? 'none' : 'block';
+
+    if (!isPlaceholder) {
+      const canUpload = isAdmin() || g.memberUids?.includes(currentUser.uid) || g.visibleToAllCommittee;
+      document.getElementById('group-docs-compose').style.display = canUpload ? 'block' : 'none';
+      setupDropzone('group-doc-dropzone', 'group-doc-file', 'group-doc-selected');
+      loadGroupDocuments();
+    }
+  }
+
+  async function loadGroupDocuments() {
+    const el = document.getElementById('group-docs-content');
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(query(collection(db, 'group-documents'), where('groupId','==',currentGroupId), orderBy('createdAt','desc')));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No documents uploaded yet.</p>'; return; }
+      el.innerHTML = '';
+      snap.forEach(d => {
+        const doc_ = d.data();
+        const div = document.createElement('div');
+        div.className = 'group-doc-card';
+        const fileIcon = doc_.fileName?.endsWith('.pdf') ? '📄' : (doc_.fileName?.endsWith('.docx') || doc_.fileName?.endsWith('.doc')) ? '📝' : '📎';
+        const canDelete = isAdmin() || doc_.uploadedByUid === currentUser.uid;
+        div.innerHTML = `
+          <div class="group-doc-card-row">
+            <div style="min-width:0;">
+              <div style="font-weight:600;margin-bottom:2px;">${fileIcon} ${doc_.description || 'Document'}</div>
+              <div style="font-size:13px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${doc_.fileName || ''}</div>
+              <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Uploaded by ${doc_.authorEmail} · ${formatDate(doc_.createdAt)}</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <a href="${doc_.downloadURL}" target="_blank" class="btn btn-sm" style="text-decoration:none;white-space:nowrap;" onclick="downloadFile('${doc_.downloadURL}', '${doc_.fileName}'); return false;">⬇ Download</a>
+              ${canDelete ? `<button class="btn btn-sm btn-danger group-doc-delete" data-id="${d.id}">Delete</button>` : ''}
+            </div>
+          </div>`;
+        el.appendChild(div);
+        div.querySelector('.group-doc-delete')?.addEventListener('click', async () => {
+          if (!confirm('Delete this document? This cannot be undone.')) return;
+          await deleteDoc(doc(db, 'group-documents', d.id));
+          loadGroupDocuments();
+        });
+      });
+    } catch(e) { console.error(e); el.innerHTML = '<p class="empty-state">Error loading documents.</p>'; }
+  }
+
+  document.getElementById('group-doc-upload-btn').addEventListener('click', async () => {
+    const fileInput  = document.getElementById('group-doc-file');
+    const descInput  = document.getElementById('group-doc-desc');
+    const progressEl = document.getElementById('group-doc-upload-progress');
+    const selectedEl = document.getElementById('group-doc-selected');
+    const file = fileInput.files[0];
+    if (!file) { alert('Please select a file to upload.'); return; }
+    const description = descInput.value.trim() || file.name;
+    const storagePath = `groups/${currentGroupId}/documents/${Date.now()}_${file.name}`;
+    try {
+      await uploadDocument(storagePath, file, 'group-documents',
+        { groupId: currentGroupId, description, uploadedByUid: currentUser.uid },
+        progressEl
+      );
+      fileInput.value = '';
+      descInput.value = '';
+      selectedEl.textContent = '';
+      document.getElementById('group-doc-dropzone').style.borderColor = '#cbd5e1';
+      loadGroupDocuments();
+    } catch(e) { console.error(e); }
+  });
+
+  // ── GROUP MEMBERS PANEL (view-only) ────────────────────────────────────
+
+  async function renderGroupMembersList() {
+    const el = document.getElementById('group-members-list');
+    if (!currentGroupData) return;
+    if (allUsers.length === 0) {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch(e) { console.error(e); }
+    }
+    const memberUids = currentGroupData.memberUids || [];
+    if (memberUids.length === 0) { el.innerHTML = '<p class="empty-state">No members assigned.</p>'; return; }
+    el.innerHTML = '';
+    memberUids.forEach(uid => {
+      const u = allUsers.find(x => x.id === uid);
+      const name = u ? (`${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email) : uid;
+      const div = document.createElement('div');
+      div.className = 'user-row';
+      div.innerHTML = `<div class="user-row-info">${name}</div>`;
+      el.appendChild(div);
+    });
+  }
+
+  // ── GROUP DISCUSSION ────────────────────────────────────────────────────
+
+  document.getElementById('group-disc-new-topic-btn').addEventListener('click', () => {
+    document.getElementById('group-disc-list-view').style.display = 'none';
+    document.getElementById('group-disc-new-topic-form').style.display = 'block';
+    document.getElementById('group-disc-thread-view').style.display = 'none';
+    setupDropzone('group-disc-topic-dropzone', 'group-disc-topic-file', 'group-disc-topic-file-selected');
+  });
+
+  document.getElementById('group-disc-cancel-topic-btn').addEventListener('click', () => {
+    document.getElementById('group-disc-new-topic-form').style.display = 'none';
+    document.getElementById('group-disc-list-view').style.display = 'block';
+  });
+
+  document.getElementById('group-disc-back-to-list').addEventListener('click', () => {
+    document.getElementById('group-disc-thread-view').style.display = 'none';
+    document.getElementById('group-disc-list-view').style.display = 'block';
+    currentTopicId = null;
+  });
+
+  async function loadGroupDiscussionTopics() {
+    const el = document.getElementById('group-disc-topics-list');
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(query(collection(db, 'group-discussion-topics'), where('groupId','==',currentGroupId), orderBy('createdAt','desc')));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No topics yet. Start the discussion!</p>'; return; }
+      el.innerHTML = '';
+      snap.forEach(d => el.appendChild(renderGroupTopicCard(d)));
+    } catch(e) { console.error(e); el.innerHTML = '<p class="empty-state">Error loading topics.</p>'; }
+  }
+
+  function renderGroupTopicCard(docSnap) {
+    const t = docSnap.data();
+    const div = document.createElement('div');
+    div.className = 'topic-card';
+    div.innerHTML = `
+      <div class="topic-title">${t.title}</div>
+      <div class="topic-meta">By ${t.authorEmail} · ${formatDate(t.createdAt)}</div>
+      <div class="topic-preview">${t.body || ''}</div>
+      <div class="topic-footer">
+        <span class="topic-reply-count">💬 ${t.replyCount || 0} ${t.replyCount === 1 ? 'reply' : 'replies'}</span>
+      </div>`;
+    div.addEventListener('click', () => openGroupTopic(docSnap.id));
+    return div;
+  }
+
+  async function openGroupTopic(topicId) {
+    currentTopicId = topicId;
+    const snap = await getDoc(doc(db, 'group-discussion-topics', topicId));
+    const t = snap.data();
+
+    document.getElementById('group-disc-list-view').style.display = 'none';
+    document.getElementById('group-disc-new-topic-form').style.display = 'none';
+    document.getElementById('group-disc-thread-view').style.display = 'block';
+
+    const attachment = t.attachmentURL ? `
+      <div class="attachment-link" onclick="downloadFile('${t.attachmentURL}', '${t.attachmentName}')">
+        📎 ${t.attachmentName}
+      </div>` : '';
+
+    const canDelete = isAdmin() || t.authorUid === currentUser.uid;
+    const deleteBtn = canDelete ? `<button class="btn btn-sm btn-danger" style="margin-top:8px;" id="group-delete-topic-btn">Delete Topic</button>` : '';
+
+    document.getElementById('group-disc-thread-content').innerHTML = `
+      <div class="topic-detail-header">
+        <div class="topic-detail-title">${t.title}</div>
+        <div class="topic-meta">By ${t.authorEmail} · ${formatDate(t.createdAt)}</div>
+        <div class="topic-body-full">${t.body || ''}</div>
+        ${attachment}
+        ${deleteBtn}
+      </div>
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:10px;">Replies</h4>
+      <div id="group-disc-replies-list"></div>`;
+
+    loadGroupReplies(topicId);
+    setupDropzone('group-disc-reply-dropzone', 'group-disc-reply-file', 'group-disc-reply-file-selected');
+
+    document.getElementById('group-delete-topic-btn')?.addEventListener('click', async () => {
+      if (!confirm('Delete this topic and all its replies? This cannot be undone.')) return;
+      await deleteDoc(doc(db, 'group-discussion-topics', topicId));
+      document.getElementById('group-disc-thread-view').style.display = 'none';
+      document.getElementById('group-disc-list-view').style.display = 'block';
+      loadGroupDiscussionTopics();
+    });
+  }
+
+  async function loadGroupReplies(topicId) {
+    const el = document.getElementById('group-disc-replies-list');
+    if (!el) return;
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(query(collection(db, 'group-discussion-replies'), where('topicId','==',topicId), orderBy('createdAt','asc')));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No replies yet — be the first!</p>'; return; }
+      el.innerHTML = '';
+      snap.forEach(d => {
+        const r = d.data();
+        const div = document.createElement('div');
+        div.className = 'reply-card';
+        const attachment = r.attachmentURL ? `
+          <div class="attachment-link" onclick="downloadFile('${r.attachmentURL}', '${r.attachmentName}')">
+            📎 ${r.attachmentName}
+          </div>` : '';
+        const canDelete = isAdmin() || r.authorUid === currentUser.uid;
+        const deleteBtn = canDelete ? `<button class="btn btn-sm btn-danger" style="margin-top:8px;font-size:11px;" onclick="window._deleteGroupReply('${d.id}', '${topicId}')">Delete</button>` : '';
+        div.innerHTML = `
+          <div class="reply-meta">${r.authorEmail} · ${formatDate(r.createdAt)}</div>
+          <div class="reply-body">${r.body || ''}</div>
+          ${attachment}
+          ${deleteBtn}`;
+        el.appendChild(div);
+      });
+    } catch(e) { console.error(e); }
+  }
+
+  window._deleteGroupReply = async function(replyId, topicId) {
+    if (!confirm('Delete this reply?')) return;
+    await deleteDoc(doc(db, 'group-discussion-replies', replyId));
+    await updateDoc(doc(db, 'group-discussion-topics', topicId), { replyCount: increment(-1) });
+    loadGroupReplies(topicId);
+  };
+
+  document.getElementById('group-disc-post-topic-btn').addEventListener('click', async () => {
+    const title = document.getElementById('group-disc-topic-title').value.trim();
+    const body  = document.getElementById('group-disc-topic-body').value.trim();
+    if (!title || !body) { alert('Please enter a title and message.'); return; }
+
+    const progressEl = document.getElementById('group-disc-topic-progress');
+    progressEl.style.display = 'block';
+
+    try {
+      let attachmentURL = null, attachmentName = null;
+      const file = document.getElementById('group-disc-topic-file').files[0];
+      if (file) {
+        const storageRef = ref(storage, `groups/${currentGroupId}/discussion-attachments/${Date.now()}_${file.name}`);
+        await new Promise((resolve, reject) => {
+          uploadBytesResumable(storageRef, file).on('state_changed', null, reject, async () => {
+            attachmentURL = await getDownloadURL(storageRef);
+            attachmentName = file.name;
+            resolve();
+          });
+        });
+      }
+
+      await addDoc(collection(db, 'group-discussion-topics'), {
+        groupId: currentGroupId,
+        title, body,
+        authorEmail: currentUser.email,
+        authorUid: currentUser.uid,
+        replyCount: 0,
+        attachmentURL, attachmentName,
+        createdAt: serverTimestamp()
+      });
+
+      document.getElementById('group-disc-topic-title').value = '';
+      document.getElementById('group-disc-topic-body').value = '';
+      document.getElementById('group-disc-topic-file').value = '';
+      document.getElementById('group-disc-topic-file-selected').textContent = '';
+      progressEl.style.display = 'none';
+      document.getElementById('group-disc-new-topic-form').style.display = 'none';
+      document.getElementById('group-disc-list-view').style.display = 'block';
+      loadGroupDiscussionTopics();
+    } catch(e) { console.error(e); progressEl.textContent = 'Error posting. Please try again.'; }
+  });
+
+  document.getElementById('group-disc-post-reply-btn').addEventListener('click', async () => {
+    const body = document.getElementById('group-disc-reply-body').value.trim();
+    if (!body) { alert('Please write a reply.'); return; }
+    if (!currentTopicId) return;
+
+    const progressEl = document.getElementById('group-disc-reply-progress');
+    progressEl.style.display = 'block';
+
+    try {
+      let attachmentURL = null, attachmentName = null;
+      const file = document.getElementById('group-disc-reply-file').files[0];
+      if (file) {
+        const storageRef = ref(storage, `groups/${currentGroupId}/discussion-attachments/${currentTopicId}/${Date.now()}_${file.name}`);
+        await new Promise((resolve, reject) => {
+          uploadBytesResumable(storageRef, file).on('state_changed', null, reject, async () => {
+            attachmentURL = await getDownloadURL(storageRef);
+            attachmentName = file.name;
+            resolve();
+          });
+        });
+      }
+
+      await addDoc(collection(db, 'group-discussion-replies'), {
+        topicId: currentTopicId,
+        body, attachmentURL, attachmentName,
+        authorEmail: currentUser.email,
+        authorUid: currentUser.uid,
+        createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, 'group-discussion-topics', currentTopicId), { replyCount: increment(1) });
+
+      document.getElementById('group-disc-reply-body').value = '';
+      document.getElementById('group-disc-reply-file').value = '';
+      document.getElementById('group-disc-reply-file-selected').textContent = '';
+      progressEl.style.display = 'none';
+      loadGroupReplies(currentTopicId);
+    } catch(e) { console.error(e); progressEl.textContent = 'Error posting reply.'; }
+  });
+
+
+  // ════════════════════════════════════════════════════════════════════════
+  // ── MANAGE USERS (two-tier admin) ─────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
+
+  let editingUserId = null; // null = creating a new user; otherwise editing this uid
+
+  async function loadUsers() {
+    const list = document.getElementById('users-list');
+    list.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      list.innerHTML = '';
+      allUsers.forEach(u => {
+        const row = document.createElement('div');
+        row.className = 'user-row';
+        const committees = [u.isBoardMember?'Board':'', u.isFCMember?'Finance Cttee':'', u.isFundraisingMember?'Fundraising':''].filter(Boolean).join(', ');
+        const roleBadgeClass = u.role === 'superadmin' ? 'role-superadmin' : u.role === 'admin' ? 'role-admin' : u.role === 'ceo' ? 'role-ceo' : 'role-other';
+        const roleLabel = u.role === 'superadmin' ? 'Super Admin' : u.role === 'admin' ? 'Admin' : u.role === 'ceo' ? 'CEO' : (u.role || '—');
+        row.innerHTML = `<div><div class="user-row-info">${u.firstName || ''} ${u.lastName || ''} — ${u.email || ''}
+            <span class="role-badge ${roleBadgeClass}">${roleLabel}</span></div>
+          <div class="user-row-role">Committees: ${committees || 'None'}</div></div>`;
+        list.appendChild(row);
+      });
+    } catch(e) { list.innerHTML = '<p class="empty-state">Error loading users.</p>'; }
+  }
+
+  document.getElementById('add-user-btn').addEventListener('click', () => {
+    editingUserId = null;
+    document.getElementById('user-form-heading').textContent = 'New User';
+    document.getElementById('add-user-form').style.display = 'block';
+  });
+  document.getElementById('cancel-user-btn').addEventListener('click', () => {
+    document.getElementById('add-user-form').style.display = 'none';
+  });
+
+  document.getElementById('save-user-btn').addEventListener('click', async () => {
+    const uid   = document.getElementById('new-user-uid').value.trim();
+    const email = document.getElementById('new-user-email').value.trim();
+    const role  = document.getElementById('new-user-role').value;
+    const errEl = document.getElementById('user-form-error');
+    if (!uid)   { errEl.textContent = 'Firebase Auth UID is required.'; return; }
+    if (!email) { errEl.textContent = 'Email is required.'; return; }
+    // Client-side guard mirroring the Firestore rule: a plain admin (not
+    // superadmin) cannot set role to admin/superadmin. The rule is the
+    // real enforcement; this just gives an immediate, friendly message
+    // instead of letting the write fail silently against the backend.
+    if ((role === 'admin' || role === 'superadmin') && !isSuperAdmin()) {
+      errEl.textContent = 'Only a Super Admin can grant Admin or Super Admin access.';
+      return;
+    }
+    try {
+      await setDoc(doc(db, 'users', uid), {
+        firstName:          document.getElementById('new-user-firstname').value.trim(),
+        lastName:           document.getElementById('new-user-lastname').value.trim(),
+        email,
+        role,
+        isBoardMember:      document.getElementById('nu-is-board').checked,
+        isFCMember:         document.getElementById('nu-is-fc').checked,
+        isFundraisingMember:document.getElementById('nu-is-fundraising').checked,
+        chairBoard:         document.getElementById('nu-chair-board').checked,
+        chairFC:            document.getElementById('nu-chair-fc').checked,
+        chairFundraising:   document.getElementById('nu-chair-fundraising').checked,
+        createdAt:          serverTimestamp()
+      });
+      document.getElementById('new-user-uid').value = '';
+      document.getElementById('new-user-firstname').value = '';
+      document.getElementById('new-user-lastname').value = '';
+      document.getElementById('new-user-email').value = '';
+      document.getElementById('add-user-form').style.display = 'none';
+      errEl.textContent = '';
+      loadUsers();
+    } catch(e) {
+      console.error(e);
+      // A Firestore permission-denied here most likely means the rule
+      // caught exactly the admin-escalation case checked above (e.g. if
+      // someone bypassed the client check) — give a clear message rather
+      // than a raw Firebase error.
+      errEl.textContent = 'Error saving user. Check the UID is correct, and that you have permission to set this role.';
+    }
+  });
+
+</script>
+</body>
+</html>
