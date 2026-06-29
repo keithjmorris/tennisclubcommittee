@@ -2026,6 +2026,15 @@
 
   async function ensureFixtureGroups() {
     console.log('DEBUG ensureFixtureGroups called. currentUserData=', currentUserData, 'isAdmin()=', isAdmin());
+    // Isolated test: read our OWN users doc again, directly, right here,
+    // to check whether a plain getDoc on /users/{uid} succeeds on its own
+    // (separate from any /groups rule logic that might call get() internally).
+    try {
+      const selfCheck = await getDoc(doc(db, 'users', currentUser.uid));
+      console.log('DEBUG isolated self-read of users/{uid} SUCCEEDED. exists=', selfCheck.exists());
+    } catch(e2) {
+      console.log('DEBUG isolated self-read of users/{uid} FAILED. code=', e2.code, 'message=', e2.message);
+    }
     if (!isAdmin()) return; // only an admin/superadmin session can create them
     try {
       const snap = await getDocs(collection(db, 'groups'));
@@ -2046,7 +2055,12 @@
           });
         }
       }
-    } catch(e) { console.error('Could not verify/create fixture groups', e); }
+    } catch(e) {
+      console.error('Could not verify/create fixture groups', e);
+      console.log('DEBUG full error: code=', e.code, 'message=', e.message, 'name=', e.name, 'stack=', e.stack);
+      console.log('DEBUG error keys=', Object.keys(e));
+      try { console.log('DEBUG error JSON=', JSON.stringify(e)); } catch(_) { console.log('DEBUG error JSON= (could not stringify)'); }
+    }
   }
 
   async function loadGroups() {
