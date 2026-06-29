@@ -955,7 +955,11 @@
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));
         currentUserData = snap.exists() ? snap.data() : {};
-      } catch(e) { currentUserData = {}; }
+        console.log('DEBUG user doc loaded. uid=', user.uid, 'exists=', snap.exists(), 'data=', currentUserData);
+      } catch(e) {
+        currentUserData = {};
+        console.log('DEBUG user doc FAILED to load. uid=', user.uid, 'error code=', e.code, 'error message=', e.message);
+      }
       setupUI();
       loadFinancesData();
       loadMeetings('board');
@@ -2021,6 +2025,7 @@
   let currentTopicId = null;
 
   async function ensureFixtureGroups() {
+    console.log('DEBUG ensureFixtureGroups called. currentUserData=', currentUserData, 'isAdmin()=', isAdmin());
     if (!isAdmin()) return; // only an admin/superadmin session can create them
     try {
       const snap = await getDocs(collection(db, 'groups'));
