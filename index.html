@@ -244,9 +244,9 @@
   </header>
 
   <!-- Pages -->
-  <!-- BOARD PAGE -->
+  <!-- COMMITTEE PAGE -->
   <div id="page-board" class="page active meetings-page">
-    <h2>Board</h2>
+    <h2>Committee</h2>
     <p class="subtitle">Meetings, papers and actions</p>
     <div class="mtab-bar">
       <button class="mtab active" data-mtab="board-tab-meetings">Meetings</button>
@@ -258,7 +258,7 @@
     <div class="mtab-content active" id="board-tab-meetings">
       <div id="board-meetings-list-view" style="margin-top:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <strong>Board Meetings</strong>
+          <strong>Committee Meetings</strong>
           <button class="btn btn-sm" id="board-add-meeting-btn" style="display:none;">+ New Meeting</button>
         </div>
         <div id="board-meetings-list"><p class="empty-state">Loading...</p></div>
@@ -266,7 +266,7 @@
       <div id="board-add-meeting-form" style="display:none;" class="card">
         <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Meeting</h3>
         <div class="form-row">
-          <div><label>Meeting Title</label><input type="text" id="board-meeting-title" placeholder="e.g. Board Meeting — June 2026"></div>
+          <div><label>Meeting Title</label><input type="text" id="board-meeting-title" placeholder="e.g. Committee Meeting — June 2026"></div>
           <div><label>Meeting Date</label><input type="date" id="board-meeting-date"></div>
         </div>
         <div class="form-actions">
@@ -554,14 +554,14 @@
       <div style="margin-bottom:14px;">
         <label style="margin-bottom:8px;">Committee membership</label>
         <div style="display:flex;flex-wrap:wrap;gap:12px;">
-          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-board" style="width:auto;"> Board</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-board" style="width:auto;"> Committee</label>
         </div>
       </div>
       <!-- Chair roles -->
       <div style="margin-bottom:14px;">
         <label style="margin-bottom:8px;">Chair of</label>
         <div style="display:flex;flex-wrap:wrap;gap:12px;">
-          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-board" style="width:auto;"> Board</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-board" style="width:auto;"> Committee</label>
         </div>
       </div>
       <div class="form-actions">
@@ -575,7 +575,7 @@
 
   <!-- BOTTOM TAB BAR -->
   <nav class="tab-bar">
-    <button class="tab-item active" data-tab="board"><span class="tab-icon">🗂</span>Board</button>
+    <button class="tab-item active" data-tab="board"><span class="tab-icon">🗂</span>Committee</button>
     <button class="tab-item" data-tab="groups"><span class="tab-icon">📁</span>Groups</button>
   </nav>
 
@@ -601,7 +601,7 @@
   let currentUserData = null; // Firestore user doc
   let allUsers = []; // cached list of {id, ...data} for member pickers etc.
 
-  // Board is now the only committee with this dedicated meetings structure
+  // Committee is now the only committee with this dedicated meetings structure
   // (Finance Committee and Fundraising were retired in favour of the
   // Finances/Membership/Team Results Groups; see project history).
   const currentMeetingId = { board: null };
@@ -776,7 +776,7 @@
     });
   });
 
-  // ── MEETINGS (Board — the club's single committee; FC and Fundraising ──────
+  // ── MEETINGS (Committee — the club's single committee; FC and Fundraising ──────
   // ── were retired in favour of the Finances/Membership/Team Results Groups) ─
 
   const COMMITTEE_COLLECTIONS = {
@@ -984,7 +984,7 @@
   });
 
   /*
-    Generic upload helper — used by Board/FC/Fundraising papers+minutes
+    Generic upload helper — used by Committee/FC/Fundraising papers+minutes
     AND by the new Groups document library. Uploads to Storage, then
     writes a metadata record to the given Firestore collection.
   */
@@ -1052,7 +1052,7 @@
     } catch(e) { console.error(e); }
   }
 
-  // ── ACTIONS (Board / FC / Fundraising — unchanged) ──────────────────────────
+  // ── ACTIONS (Committee / FC / Fundraising — unchanged) ──────────────────────────
 
   async function loadMeetingActions(prefix) {
     const el = document.getElementById(prefix + '-meeting-actions-list');
@@ -1240,7 +1240,7 @@
   // below, which runs harmlessly every time the app loads — it only
   // creates a fixture if one with that exact name doesn't already exist.
   //
-  // Note: Board's own agendas/minutes/actions live in its own dedicated
+  // Note: Committee's own agendas/minutes/actions live in its own dedicated
   // meeting structure (see COMMITTEE_COLLECTIONS above), not here — an
   // earlier "Agendas & Minutes" fixture group was retired once that
   // became clear, to avoid two competing homes for the same material.
@@ -1745,7 +1745,7 @@
       allUsers.forEach(u => {
         const row = document.createElement('div');
         row.className = 'user-row';
-        const committees = [u.isBoardMember?'Board':''].filter(Boolean).join(', ');
+        const committees = [u.isBoardMember?' Committee':''].filter(Boolean).join(', ');
         const roleBadgeClass = u.role === 'superadmin' ? 'role-superadmin' : u.role === 'admin' ? 'role-admin' : u.role === 'ceo' ? 'role-ceo' : 'role-other';
         const roleLabel = u.role === 'superadmin' ? 'Super Admin' : u.role === 'admin' ? 'Admin' : u.role === 'ceo' ? 'CEO' : (u.role || '—');
         row.innerHTML = `<div><div class="user-row-info">${u.firstName || ''} ${u.lastName || ''} — ${u.email || ''}
