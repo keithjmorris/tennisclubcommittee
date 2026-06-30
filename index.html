@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Burnhams Tennis Club</title>
-  <link rel="apple-touch-icon" href="tennisball.png">
-  <link rel="icon" type="image/png" href="tennisball.png">
+  <link rel="apple-touch-icon" href="caslogo.png">
+  <link rel="icon" type="image/png" href="caslogo.png">
   <meta name="theme-color" content="#2979FF">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 
   <style>
@@ -236,7 +235,7 @@
 
   <!-- Top header -->
   <header class="app-header">
-    <img src="tennisball.jpeg" class="app-header-logo" alt="The Burnhams Tennis Club" onerror="this.style.display='none';document.getElementById('header-title-text').style.display='block';" />
+    <img src="caslogo.jpeg" class="app-header-logo" alt="The Burnhams Tennis Club" onerror="this.style.display='none';document.getElementById('header-title-text').style.display='block';" />
     <span id="header-title-text" style="display:none;font-size:18px;font-weight:700;color:#2979FF;font-style:italic;">The Burnhams Tennis Club</span>
     <div id="header-user-info" style="display:flex;align-items:center;gap:10px;">
       <span id="header-user-email" style="font-size:12px;color:#94a3b8;"></span>
@@ -245,73 +244,8 @@
   </header>
 
   <!-- Pages -->
-  <div id="page-finances" class="page active meetings-page">
-    <h2>Finances</h2>
-    <p class="subtitle">Income &amp; expenditure, balance sheet and investments</p>
-    <div class="mtab-bar">
-      <button class="mtab active" data-mtab="fin-tab-ie">Income &amp; Expenditure</button>
-      <button class="mtab" data-mtab="fin-tab-balance">Balance Sheet</button>
-      <button class="mtab" data-mtab="fin-tab-investments">Investments</button>
-    </div>
-
-    <!-- Income & Expenditure sub-tab (existing content, unchanged) -->
-    <div class="mtab-content active" id="fin-tab-ie" style="margin-top:16px;">
-      <div id="loading-message">Loading…</div>
-      <div id="list-view">
-        <div class="list-card" id="list-card" style="display:none;"></div>
-      </div>
-      <div id="detail-view">
-        <button class="back-button" id="back-to-list">‹ &nbsp;Back</button>
-        <div class="detail-title" id="detail-title"></div>
-        <div id="detail-content"></div>
-      </div>
-      <div id="chart-view">
-        <button class="back-button" id="back-to-detail">‹ &nbsp;Back</button>
-        <div class="detail-title" id="chart-month-title"></div>
-        <div class="chart-card">
-          <div class="chart-title" id="chart-title"></div>
-          <div class="chart-canvas-wrapper"><canvas id="myChart"></canvas></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Balance Sheet sub-tab -->
-    <div class="mtab-content" id="fin-tab-balance" style="margin-top:16px;">
-      <div id="balance-loading-message" style="text-align:center;color:#666;padding:32px;">Loading…</div>
-      <div id="balance-list-view">
-        <div class="list-card" id="balance-list-card" style="display:none;"></div>
-      </div>
-      <div id="balance-detail-view" style="display:none;">
-        <button class="back-button" id="balance-back-to-list">‹ &nbsp;Back</button>
-        <div class="detail-title" id="balance-detail-title"></div>
-        <div id="balance-detail-content"></div>
-      </div>
-    </div>
-
-    <!-- Investments sub-tab — shows the latest investment performance PDF -->
-    <div class="mtab-content" id="fin-tab-investments" style="margin-top:16px;">
-      <div id="investments-loading" style="text-align:center;color:#666;padding:32px;">Loading…</div>
-      <div id="investments-content" style="display:none;">
-        <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:600;margin-bottom:2px;">📄 Investment Performance Report</div>
-            <div id="investments-updated" style="font-size:12px;color:#94a3b8;"></div>
-          </div>
-          <a href="#" id="investments-download-link" class="btn btn-sm" style="text-decoration:none;" onclick="downloadFile(window._investmentsPdfUrl, 'Investment Performance Report.pdf'); return false;">⬇ Download</a>
-        </div>
-        <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff;">
-          <iframe id="investments-pdf-frame" style="width:100%;height:75vh;border:none;display:block;" title="Investment Performance Report"></iframe>
-        </div>
-        <p style="font-size:12px;color:#94a3b8;margin-top:8px;">If the PDF doesn't display above, use the Download button instead.</p>
-      </div>
-      <div id="investments-empty" style="display:none;">
-        <p class="empty-state">No investment performance report has been uploaded yet.</p>
-      </div>
-    </div>
-  </div>
-
   <!-- BOARD PAGE -->
-  <div id="page-board" class="page meetings-page">
+  <div id="page-board" class="page active meetings-page">
     <h2>Board</h2>
     <p class="subtitle">Meetings, papers and actions</p>
     <div class="mtab-bar">
@@ -443,232 +377,6 @@
         </div>
       </div>
       <div id="board-all-list"></div>
-    </div>
-  </div>
-
-  <!-- FINANCE COMMITTEE PAGE (identical structure, different prefix) -->
-  <div id="page-finance-committee" class="page meetings-page">
-    <h2>Finance Committee</h2>
-    <p class="subtitle">Meetings, papers and actions</p>
-    <div class="mtab-bar">
-      <button class="mtab active" data-mtab="fc-tab-meetings">Meetings</button>
-      <button class="mtab" data-mtab="fc-tab-outstanding">Outstanding Actions</button>
-      <button class="mtab" data-mtab="fc-tab-all">All Actions</button>
-    </div>
-    <div class="mtab-content active" id="fc-tab-meetings">
-      <div id="fc-meetings-list-view" style="margin-top:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <strong>Finance Committee Meetings</strong>
-          <button class="btn btn-sm" id="fc-add-meeting-btn" style="display:none;">+ New Meeting</button>
-        </div>
-        <div id="fc-meetings-list"><p class="empty-state">Loading...</p></div>
-      </div>
-      <div id="fc-add-meeting-form" style="display:none;" class="card">
-        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Meeting</h3>
-        <div class="form-row">
-          <div><label>Meeting Title</label><input type="text" id="fc-meeting-title"></div>
-          <div><label>Meeting Date</label><input type="date" id="fc-meeting-date"></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn" id="fc-save-meeting-btn">Save Meeting</button>
-          <button class="btn btn-secondary" id="fc-cancel-meeting-btn">Cancel</button>
-        </div>
-      </div>
-      <div id="fc-meeting-detail" style="display:none;">
-        <button class="back-button" id="fc-back-to-meetings">‹ &nbsp;Meetings</button>
-        <h3 id="fc-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
-        <p id="fc-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
-        <div class="sub-tab-bar">
-          <button class="sub-tab active" data-subtab="fc-panel-papers">Papers</button>
-          <button class="sub-tab" data-subtab="fc-panel-minutes">Minutes</button>
-          <button class="sub-tab" data-subtab="fc-panel-actions">Actions</button>
-        </div>
-        <div id="fc-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
-          <div id="fc-papers-compose" class="compose-area" style="display:none;">
-            <div class="form-row-full" style="margin-bottom:10px;">
-              <label>Document Description</label>
-              <input type="text" id="fc-papers-desc" placeholder="e.g. Agenda, Financial Summary...">
-            </div>
-            <label>Select File</label>
-            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
-            <div id="fc-papers-dropzone" class="dropzone">
-              <div class="dz-icon">📎</div>
-              <div class="dz-text">Drag and drop a file here, or click to browse</div>
-              <input type="file" id="fc-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
-            </div>
-            <div id="fc-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
-            <div id="fc-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
-            <button class="btn" id="fc-post-papers-btn">Upload Document</button>
-          </div>
-          <div id="fc-papers-content"></div>
-        </div>
-        <div id="fc-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
-          <div id="fc-minutes-compose" class="compose-area" style="display:none;">
-            <label>Upload Minutes</label>
-            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Uploading a new file will replace the existing minutes.</p>
-            <div id="fc-minutes-dropzone" class="dropzone">
-              <div class="dz-icon">📋</div>
-              <div class="dz-text">Drag and drop minutes here, or click to browse</div>
-              <input type="file" id="fc-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
-            </div>
-            <div id="fc-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
-            <div id="fc-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
-            <button class="btn" id="fc-post-minutes-btn">Upload Minutes</button>
-          </div>
-          <div id="fc-minutes-content"></div>
-        </div>
-        <div id="fc-panel-actions" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
-          <div class="carried-section"><div class="carried-heading">⟳ Carried Over from Previous Meetings</div><div id="fc-carried-list"></div></div>
-          <div class="section-heading-dark">Actions Arising from This Meeting</div>
-          <div id="fc-actions-compose" class="compose-area" style="display:none;">
-            <div class="form-row">
-              <div><label>Action Title</label><input type="text" id="fc-action-title"></div>
-              <div><label>Assigned To</label><select id="fc-action-assigned"><option>Chair</option><option>CEO</option><option>Trustee</option><option>All Trustees</option></select></div>
-              <div><label>Target Date</label><input type="date" id="fc-action-target"></div>
-              <div><label>Status</label><select id="fc-action-status"><option value="Open">Open</option><option value="In Progress">In Progress</option></select></div>
-            </div>
-            <div class="form-row-full"><label>Description</label><textarea id="fc-action-desc" rows="3"></textarea></div>
-            <div class="form-row-full"><label><input type="checkbox" id="fc-action-staff-visible" style="width:auto;margin-right:6px;">Visible to staff</label></div>
-            <button class="btn" id="fc-post-action-btn">Add Action</button>
-          </div>
-          <div id="fc-meeting-actions-list"></div>
-        </div>
-      </div>
-    </div>
-    <div class="mtab-content" id="fc-tab-outstanding" style="margin-top:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <strong>Outstanding Actions</strong>
-        <div class="filter-btn-group">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="Open">Open</button>
-          <button class="filter-btn" data-filter="In Progress">In Progress</button>
-        </div>
-      </div>
-      <div id="fc-outstanding-list"></div>
-    </div>
-    <div class="mtab-content" id="fc-tab-all" style="margin-top:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <strong>All Actions</strong>
-        <div class="filter-btn-group">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="open">Open</button>
-          <button class="filter-btn" data-filter="completed">Completed</button>
-        </div>
-      </div>
-      <div id="fc-all-list"></div>
-    </div>
-  </div>
-
-  <!-- FUNDRAISING COMMITTEE PAGE -->
-  <div id="page-fundraising" class="page meetings-page">
-    <h2>Fundraising Committee</h2>
-    <p class="subtitle">Meetings, papers and actions</p>
-    <div class="mtab-bar">
-      <button class="mtab active" data-mtab="fundraising-tab-meetings">Meetings</button>
-      <button class="mtab" data-mtab="fundraising-tab-outstanding">Outstanding Actions</button>
-      <button class="mtab" data-mtab="fundraising-tab-all">All Actions</button>
-    </div>
-    <div class="mtab-content active" id="fundraising-tab-meetings">
-      <div id="fundraising-meetings-list-view" style="margin-top:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <strong>Fundraising Committee Meetings</strong>
-          <button class="btn btn-sm" id="fundraising-add-meeting-btn" style="display:none;">+ New Meeting</button>
-        </div>
-        <div id="fundraising-meetings-list"><p class="empty-state">Loading...</p></div>
-      </div>
-      <div id="fundraising-add-meeting-form" style="display:none;" class="card">
-        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Meeting</h3>
-        <div class="form-row">
-          <div><label>Meeting Title</label><input type="text" id="fundraising-meeting-title"></div>
-          <div><label>Meeting Date</label><input type="date" id="fundraising-meeting-date"></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn" id="fundraising-save-meeting-btn">Save Meeting</button>
-          <button class="btn btn-secondary" id="fundraising-cancel-meeting-btn">Cancel</button>
-        </div>
-      </div>
-      <div id="fundraising-meeting-detail" style="display:none;">
-        <button class="back-button" id="fundraising-back-to-meetings">‹ &nbsp;Meetings</button>
-        <h3 id="fundraising-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
-        <p id="fundraising-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
-        <div class="sub-tab-bar">
-          <button class="sub-tab active" data-subtab="fundraising-panel-papers">Papers</button>
-          <button class="sub-tab" data-subtab="fundraising-panel-minutes">Minutes</button>
-          <button class="sub-tab" data-subtab="fundraising-panel-actions">Actions</button>
-        </div>
-        <div id="fundraising-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
-          <div id="fundraising-papers-compose" class="compose-area" style="display:none;">
-            <div class="form-row-full" style="margin-bottom:10px;">
-              <label>Document Description</label>
-              <input type="text" id="fundraising-papers-desc" placeholder="e.g. Agenda, Financial Summary...">
-            </div>
-            <label>Select File</label>
-            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
-            <div id="fundraising-papers-dropzone" class="dropzone">
-              <div class="dz-icon">📎</div>
-              <div class="dz-text">Drag and drop a file here, or click to browse</div>
-              <input type="file" id="fundraising-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
-            </div>
-            <div id="fundraising-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
-            <div id="fundraising-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
-            <button class="btn" id="fundraising-post-papers-btn">Upload Document</button>
-          </div>
-          <div id="fundraising-papers-content"></div>
-        </div>
-        <div id="fundraising-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
-          <div id="fundraising-minutes-compose" class="compose-area" style="display:none;">
-            <label>Upload Minutes</label>
-            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Uploading a new file will replace the existing minutes.</p>
-            <div id="fundraising-minutes-dropzone" class="dropzone">
-              <div class="dz-icon">📋</div>
-              <div class="dz-text">Drag and drop minutes here, or click to browse</div>
-              <input type="file" id="fundraising-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
-            </div>
-            <div id="fundraising-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
-            <div id="fundraising-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
-            <button class="btn" id="fundraising-post-minutes-btn">Upload Minutes</button>
-          </div>
-          <div id="fundraising-minutes-content"></div>
-        </div>
-        <div id="fundraising-panel-actions" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
-          <div class="carried-section"><div class="carried-heading">⟳ Carried Over from Previous Meetings</div><div id="fundraising-carried-list"></div></div>
-          <div class="section-heading-dark">Actions Arising from This Meeting</div>
-          <div id="fundraising-actions-compose" class="compose-area" style="display:none;">
-            <div class="form-row">
-              <div><label>Action Title</label><input type="text" id="fundraising-action-title"></div>
-              <div><label>Assigned To</label><select id="fundraising-action-assigned"><option>Chair</option><option>CEO</option><option>Trustee</option><option>All Trustees</option></select></div>
-              <div><label>Target Date</label><input type="date" id="fundraising-action-target"></div>
-              <div><label>Status</label><select id="fundraising-action-status"><option value="Open">Open</option><option value="In Progress">In Progress</option></select></div>
-            </div>
-            <div class="form-row-full"><label>Description</label><textarea id="fundraising-action-desc" rows="3"></textarea></div>
-            <div class="form-row-full"><label><input type="checkbox" id="fundraising-action-staff-visible" style="width:auto;margin-right:6px;">Visible to staff</label></div>
-            <button class="btn" id="fundraising-post-action-btn">Add Action</button>
-          </div>
-          <div id="fundraising-meeting-actions-list"></div>
-        </div>
-      </div>
-    </div>
-    <div class="mtab-content" id="fundraising-tab-outstanding" style="margin-top:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <strong>Outstanding Actions</strong>
-        <div class="filter-btn-group">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="Open">Open</button>
-          <button class="filter-btn" data-filter="In Progress">In Progress</button>
-        </div>
-      </div>
-      <div id="fundraising-outstanding-list"></div>
-    </div>
-    <div class="mtab-content" id="fundraising-tab-all" style="margin-top:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <strong>All Actions</strong>
-        <div class="filter-btn-group">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="open">Open</button>
-          <button class="filter-btn" data-filter="completed">Completed</button>
-        </div>
-      </div>
-      <div id="fundraising-all-list"></div>
     </div>
   </div>
 
@@ -847,8 +555,6 @@
         <label style="margin-bottom:8px;">Committee membership</label>
         <div style="display:flex;flex-wrap:wrap;gap:12px;">
           <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-board" style="width:auto;"> Board</label>
-          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-fc" style="width:auto;"> Finance Committee</label>
-          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-is-fundraising" style="width:auto;"> Fundraising Committee</label>
         </div>
       </div>
       <!-- Chair roles -->
@@ -856,8 +562,6 @@
         <label style="margin-bottom:8px;">Chair of</label>
         <div style="display:flex;flex-wrap:wrap;gap:12px;">
           <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-board" style="width:auto;"> Board</label>
-          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-fc" style="width:auto;"> Finance Committee</label>
-          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="nu-chair-fundraising" style="width:auto;"> Fundraising Committee</label>
         </div>
       </div>
       <div class="form-actions">
@@ -871,10 +575,7 @@
 
   <!-- BOTTOM TAB BAR -->
   <nav class="tab-bar">
-    <button class="tab-item active" data-tab="finances"><span class="tab-icon">💰</span>Finances</button>
-    <button class="tab-item" data-tab="board"><span class="tab-icon">🗂</span>Board</button>
-    <button class="tab-item" data-tab="finance-committee"><span class="tab-icon">📊</span>Finance Cttee</button>
-    <button class="tab-item" data-tab="fundraising"><span class="tab-icon">🎗</span>Fundraising</button>
+    <button class="tab-item active" data-tab="board"><span class="tab-icon">🗂</span>Board</button>
     <button class="tab-item" data-tab="groups"><span class="tab-icon">📁</span>Groups</button>
   </nav>
 
@@ -898,13 +599,12 @@
 
   let currentUser = null;
   let currentUserData = null; // Firestore user doc
-  let currentChart = null;
-  let currentFinanceQuarter = null;
-  let allQuarters = [];
   let allUsers = []; // cached list of {id, ...data} for member pickers etc.
 
-  // Per-committee current meeting id
-  const currentMeetingId = { board: null, fc: null, fundraising: null };
+  // Board is now the only committee with this dedicated meetings structure
+  // (Finance Committee and Fundraising were retired in favour of the
+  // Finances/Membership/Team Results Groups; see project history).
+  const currentMeetingId = { board: null };
 
   // ── AUTH ───────────────────────────────────────────────────────────────────
 
@@ -955,16 +655,9 @@
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));
         currentUserData = snap.exists() ? snap.data() : {};
-        console.log('DEBUG user doc loaded. uid=', user.uid, 'exists=', snap.exists(), 'data=', currentUserData);
-      } catch(e) {
-        currentUserData = {};
-        console.log('DEBUG user doc FAILED to load. uid=', user.uid, 'error code=', e.code, 'error message=', e.message);
-      }
+      } catch(e) { currentUserData = {}; }
       setupUI();
-      loadFinancesData();
       loadMeetings('board');
-      loadMeetings('fc');
-      loadMeetings('fundraising');
       loadGroups();
     } else {
       currentUser = null;
@@ -982,18 +675,16 @@
 
   function canPostForCommittee(committee) {
     if (isCEO()) return true;
-    if (committee === 'board')       return currentUserData?.chairBoard === true;
-    if (committee === 'fc')          return currentUserData?.chairFC === true;
-    if (committee === 'fundraising') return currentUserData?.chairFundraising === true;
+    if (committee === 'board') return currentUserData?.chairBoard === true;
     return false;
   }
 
-  function canSignOff() { return isCEO() || currentUserData?.chairBoard || currentUserData?.chairFC || currentUserData?.chairFundraising; }
+  function canSignOff() { return isCEO() || currentUserData?.chairBoard === true; }
 
   // ── UI SETUP ───────────────────────────────────────────────────────────────
 
   function setupUI() {
-    ['board','fc','fundraising'].forEach(c => {
+    ['board'].forEach(c => {
       if (canPostForCommittee(c)) {
         document.getElementById(c + '-add-meeting-btn').style.display = 'inline-block';
       }
@@ -1038,18 +729,6 @@
       document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       showPage(btn.dataset.tab);
-      if (btn.dataset.tab === 'finances') {
-        document.getElementById('detail-view').style.display = 'none';
-        document.getElementById('chart-view').style.display = 'none';
-        document.getElementById('list-view').style.display = 'block';
-        document.getElementById('balance-detail-view').style.display = 'none';
-        document.getElementById('balance-list-view').style.display = 'block';
-        const financesPage = document.getElementById('page-finances');
-        financesPage.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
-        financesPage.querySelectorAll('.mtab-content').forEach(c => c.classList.remove('active'));
-        financesPage.querySelector('[data-mtab="fin-tab-ie"]').classList.add('active');
-        document.getElementById('fin-tab-ie').classList.add('active');
-      }
       if (btn.dataset.tab === 'groups') {
         document.getElementById('group-detail-view').style.display = 'none';
         document.getElementById('groups-new-group-form').style.display = 'none';
@@ -1071,10 +750,6 @@
       const prefix = targetId.split('-tab-')[0];
       if (targetId.endsWith('-outstanding')) loadOutstandingActions(prefix);
       if (targetId.endsWith('-all')) loadAllActions(prefix);
-      if (targetId === 'fin-tab-investments' && !window._investmentsLoaded) {
-        window._investmentsLoaded = true;
-        loadInvestmentsData();
-      }
     });
   });
 
@@ -1101,455 +776,11 @@
     });
   });
 
-  // ── FINANCES ───────────────────────────────────────────────────────────────
-
-  const FINANCE_DATA_PATH = 'finance/finances.json';
-
-  async function loadFinancesData() {
-    try {
-      const fileRef = ref(storage, FINANCE_DATA_PATH);
-      const url = await getDownloadURL(fileRef);
-      const resp = await fetch(url);
-      const json = await resp.json();
-      allQuarters = json;
-      buildFinanceList();
-    } catch(e) {
-      console.error(e);
-      document.getElementById('loading-message').textContent = 'Could not load financial data.';
-    }
-  }
-
-  const INVESTMENTS_PDF_PATH = 'finance/investments.pdf';
-
-  async function loadInvestmentsData() {
-    const loadingEl = document.getElementById('investments-loading');
-    const contentEl = document.getElementById('investments-content');
-    const emptyEl = document.getElementById('investments-empty');
-    try {
-      const fileRef = ref(storage, INVESTMENTS_PDF_PATH);
-      const url = await getDownloadURL(fileRef);
-      window._investmentsPdfUrl = url;
-      document.getElementById('investments-pdf-frame').src = url;
-      try {
-        const meta = await getMetadata(fileRef);
-        const updated = meta.updated ? new Date(meta.updated) : null;
-        document.getElementById('investments-updated').textContent = updated
-          ? `Last updated ${updated.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}`
-          : '';
-      } catch(metaErr) { /* nice-to-have only */ }
-      loadingEl.style.display = 'none';
-      contentEl.style.display = 'block';
-      emptyEl.style.display = 'none';
-    } catch(e) {
-      loadingEl.style.display = 'none';
-      contentEl.style.display = 'none';
-      emptyEl.style.display = 'block';
-    }
-  }
-
-  function buildFinanceList() {
-    const card = document.getElementById('list-card');
-    card.innerHTML = '';
-    allQuarters.forEach(quarter => {
-      const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
-      const row = document.createElement('div');
-      row.className = 'list-row';
-      row.innerHTML = `<span>${label}</span><span class="chevron">›</span>`;
-      row.onclick = () => showFinanceDetail(quarter.id);
-      card.appendChild(row);
-    });
-    document.getElementById('loading-message').style.display = 'none';
-    card.style.display = 'block';
-    buildBalanceList();
-  }
-
-  function buildBalanceList() {
-    const card = document.getElementById('balance-list-card');
-    card.innerHTML = '';
-    allQuarters.forEach(quarter => {
-      const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
-      const row = document.createElement('div');
-      row.className = 'list-row';
-      row.innerHTML = `<span>${label}</span><span class="chevron">›</span>`;
-      row.onclick = () => showBalanceDetail(quarter.id);
-      card.appendChild(row);
-    });
-    document.getElementById('balance-loading-message').style.display = 'none';
-    card.style.display = 'block';
-  }
-
-  const INCOME_STRUCTURE = [
-    { label:'ACE NPO',                                    field:'aceNpo',        bold:true },
-    { label:'Fundraising events',                         field:'fundraisingEvents', bold:true },
-    { label:'Patronage & individual donations / gift aid', bold:true, children:[
-      { label:'Individuals', field:'patronageIndividuals' },
-      { label:'Gift Aid',     field:'patronageGiftAid' },
-      { label:'Corporate',    field:'patronageCorporate' },
-    ]},
-    { label:'Paid Events',                                field:'paidEventsIncome', bold:true },
-    { label:'Restricted Donations Grants - Core',         field:'restrictedGrantsCore', bold:true },
-    { label:'Restricted Donations Grants - Acquisitions',  field:'restrictedGrantsAcquisitions', bold:true },
-    { label:'Restricted Donations Digital',               field:'restrictedDigital', bold:true },
-    { label:'Consultancy',                                field:'consultancy', bold:true },
-    { label:'Other items', bold:true, children:[
-      { label:'Legacies',                field:'otherLegacies' },
-      { label:'Bank Interest',            field:'otherBankInterest' },
-      { label:'Sales of Misc Artworks',   field:'otherSalesMiscArtworks' },
-      { label:'Historic VAT recovery',    field:'otherHistoricVatRecovery' },
-    ]},
-    { label:'Museum Subscriptions',                       field:'museumSubscriptions', bold:true },
-  ];
-
-  const EXPENDITURE_STRUCTURE = [
-    { label:'Staff, consultants & Other related costs', bold:true, children:[
-      { label:'Salaries NI pension', field:'staffSalariesNiPension' },
-      { label:'Other staff costs',   field:'staffOtherCosts' },
-    ]},
-    { label:'Non Staff Costs', bold:true, children:[
-      { label:'Property & Insurance Costs',   field:'nonStaffPropertyInsurance' },
-      { label:'Operational Costs',             field:'nonStaffOperational' },
-      { label:'IT',                            field:'nonStaffIT' },
-      { label:'Legal, Professional & finance', field:'nonStaffLegalProfessionalFinance' },
-    ]},
-    { label:'Art Purchase - Core',            field:'artPurchaseCore', bold:true },
-    { label:'Art Purchase - Special Projects', field:'artPurchaseSpecialProjects', bold:true },
-    { label:'Events',                         field:'eventsExpenditure', bold:true },
-    { label:'Other Expenditure', bold:true, children:[
-      { label:'Paid Events',                 field:'otherExpPaidEvents' },
-      { label:'Project Costs - New Website', field:'otherExpProjectCostsNewWebsite' },
-    ]},
-  ];
-
-  const FIXED_ASSETS_STRUCTURE = [
-    { label:'Property',                   field:'property', bold:true },
-    { label:'Other Tangible Fixed Assets', field:'otherTangibleFixedAssets', bold:true },
-    { label:'Investment - Future Fund',    field:'investmentFutureFund', bold:true },
-  ];
-
-  const CURRENT_ASSETS_STRUCTURE = [
-    { label:'Debtors',                    field:'debtors', bold:true },
-    { label:'Stock',                      field:'stock', bold:true },
-    { label:'Cash',                       field:'cash', bold:true },
-    { label:'Creditors',                  field:'creditors', bold:true },
-    { label:'Deferred Restricted Grants', field:'deferredRestrictedGrants', bold:true },
-  ];
-
-  const UNRESTRICTED_RESERVES_STRUCTURE = [
-    { label:'Unrestricted reserves brought forward', field:'broughtForward', bold:true },
-    { label:'Transfer to Future Fund',                field:'transferToFutureFund', bold:true },
-    { label:'Unrestricted result for the period',     field:'resultForPeriod', bold:true },
-    { label:'Transfer to Restricted funds',           field:'transferToRestrictedFunds', bold:true },
-  ];
-
-  const DESIGNATED_FUTURE_FUND_STRUCTURE = [
-    { label:'Designated Future Fund brought forward', field:'broughtForward', bold:true },
-    { label:'Designated Future Fund Investment',       field:'investment', bold:true },
-    { label:'(Losses)/Gains in the period',            field:'lossesGainsInPeriod', bold:true },
-  ];
-
-  const COLUMN_KEYS = ['actual', 'forecast', 'plan', 'prevYear'];
-  const COLUMN_LABELS = { actual:'Actual', forecast:'Forecast', plan:'Plan', prevYear:'Prev Year' };
-  const BS_COLUMN_KEYS = ['actual', 'prevYear'];
-
-  function emptyFigures(columnKeys = COLUMN_KEYS) {
-    const f = {};
-    columnKeys.forEach(k => f[k] = 0);
-    return f;
-  }
-
-  function getFigures(quarter, group, field, columnKeys = COLUMN_KEYS) {
-    return (quarter[group] && quarter[group][field]) || emptyFigures(columnKeys);
-  }
-
-  function computeTotal(quarter, group, line, columnKeys = COLUMN_KEYS) {
-    if (line.children) {
-      const total = emptyFigures(columnKeys);
-      line.children.forEach(child => {
-        const childTotal = computeTotal(quarter, group, child, columnKeys);
-        columnKeys.forEach(k => total[k] += childTotal[k]);
-      });
-      return total;
-    }
-    return getFigures(quarter, group, line.field, columnKeys);
-  }
-
-  function sumStructure(quarter, group, structure, columnKeys = COLUMN_KEYS) {
-    const total = emptyFigures(columnKeys);
-    structure.forEach(line => {
-      const t = computeTotal(quarter, group, line, columnKeys);
-      columnKeys.forEach(k => total[k] += t[k]);
-    });
-    return total;
-  }
-
-  function fmt(v) { return new Intl.NumberFormat('en-GB').format(Math.abs(Math.round(v))); }
-  function fmtCell(v) { return v < 0 ? `(${fmt(v)})` : fmt(v); }
-
-  function renderLine(quarter, group, line, depth, expandedSet, rowsOut, columnKeys = COLUMN_KEYS) {
-    const total = computeTotal(quarter, group, line, columnKeys);
-    const hasChildren = !!line.children;
-    const isExpanded = hasChildren && expandedSet.has(line.label);
-    const indent = 14 + depth * 16;
-    const toggle = hasChildren
-      ? `<span class="fin-toggle" data-toggle-label="${encodeURIComponent(line.label)}" style="cursor:pointer;display:inline-block;width:14px;">${isExpanded ? '▾' : '▸'}</span>`
-      : `<span style="display:inline-block;width:14px;"></span>`;
-    const labelClass = line.bold || hasChildren ? 'style="font-weight:700;"' : '';
-    const rowClass = hasChildren ? 'class="data-row fin-parent-row"' : 'class="data-row"';
-    const clickAttr = hasChildren ? `data-toggle-label="${encodeURIComponent(line.label)}" style="cursor:pointer;"` : '';
-    rowsOut.push(`<tr ${rowClass} ${clickAttr}>
-      <td style="padding-left:${indent}px;" ${labelClass}>${toggle}${line.label}</td>
-      ${columnKeys.map(k => `<td>${fmtCell(total[k])}</td>`).join('')}
-    </tr>`);
-    if (hasChildren && isExpanded) {
-      line.children.forEach(child => renderLine(quarter, group, child, depth + 1, expandedSet, rowsOut, columnKeys));
-    }
-  }
-
-  function buildGroupTable(quarter, group, structure, expandedSet, columnKeys = COLUMN_KEYS) {
-    const rows = [];
-    structure.forEach(line => renderLine(quarter, group, line, 0, expandedSet, rows, columnKeys));
-    return `<table><thead><tr><th></th>${columnKeys.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
-  }
-
-  function buildHeadlineCard(quarter) {
-    const income = sumStructure(quarter, 'income', INCOME_STRUCTURE);
-    const expenditure = sumStructure(quarter, 'expenditure', EXPENDITURE_STRUCTURE);
-    const beforeDep = emptyFigures();
-    COLUMN_KEYS.forEach(k => { beforeDep[k] = income[k] - expenditure[k]; });
-    const row = (label, figures, opts={}) => `<tr class="data-row" ${opts.underline ? 'style="border-top:1px solid rgba(255,255,255,0.4);"' : ''}>
-      <td style="font-weight:700;${opts.underline ? 'text-decoration:underline;' : ''}">${label}</td>
-      ${COLUMN_KEYS.map(k => `<td>${fmtCell(figures[k])}</td>`).join('')}
-    </tr>`;
-    const rows = [
-      row('Total Income', income, { underline:true }),
-      row('Total Expenditure', expenditure, { underline:true }),
-      row('Surplus / deficit before depreciation', beforeDep),
-    ].join('');
-    return `<div class="section-card"><div class="section-heading">Summary</div>
-      <table><thead><tr><th></th>${COLUMN_KEYS.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
-  }
-
-  function buildDepreciationCard(quarter) {
-    const income = sumStructure(quarter, 'income', INCOME_STRUCTURE);
-    const expenditure = sumStructure(quarter, 'expenditure', EXPENDITURE_STRUCTURE);
-    const beforeDep = emptyFigures();
-    const afterDep = emptyFigures();
-    COLUMN_KEYS.forEach(k => {
-      beforeDep[k] = income[k] - expenditure[k];
-      afterDep[k] = beforeDep[k] - (quarter.depreciation ? quarter.depreciation[k] || 0 : 0);
-    });
-    const row = (label, figures, opts={}) => `<tr class="data-row" ${opts.underline ? 'style="border-top:1px solid rgba(255,255,255,0.4);"' : ''}>
-      <td style="font-weight:700;${opts.underline ? 'text-decoration:underline;' : ''}">${label}</td>
-      ${COLUMN_KEYS.map(k => `<td>${fmtCell(figures[k])}</td>`).join('')}
-    </tr>`;
-    const rows = [
-      row('Depreciation', quarter.depreciation || emptyFigures()),
-      row('Surplus / deficit', afterDep, { underline:true }),
-    ].join('');
-    return `<div class="section-card"><div class="section-heading">Depreciation</div>
-      <table><thead><tr><th></th>${COLUMN_KEYS.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
-  }
-
-  function bsFigures(quarter, group, field) {
-    const bs = quarter.balanceSheet || {};
-    return (bs[group] && bs[group][field]) || emptyFigures(BS_COLUMN_KEYS);
-  }
-
-  function bsComputeTotal(quarter, group, line) {
-    if (line.children) {
-      const total = emptyFigures(BS_COLUMN_KEYS);
-      line.children.forEach(child => {
-        const childTotal = bsComputeTotal(quarter, group, child);
-        BS_COLUMN_KEYS.forEach(k => total[k] += childTotal[k]);
-      });
-      return total;
-    }
-    return bsFigures(quarter, group, line.field);
-  }
-
-  function bsSumStructure(quarter, group, structure) {
-    const total = emptyFigures(BS_COLUMN_KEYS);
-    structure.forEach(line => {
-      const t = bsComputeTotal(quarter, group, line);
-      BS_COLUMN_KEYS.forEach(k => total[k] += t[k]);
-    });
-    return total;
-  }
-
-  function bsRow(label, figures, opts={}) {
-    return `<tr class="data-row" ${opts.underline ? 'style="border-top:1px solid rgba(255,255,255,0.4);"' : ''}>
-      <td style="font-weight:700;${opts.underline ? 'text-decoration:underline;' : ''}">${label}</td>
-      ${BS_COLUMN_KEYS.map(k => `<td>${fmtCell(figures[k])}</td>`).join('')}
-    </tr>`;
-  }
-
-  function bsTableWrapper(heading, rowsHtml) {
-    return `<div class="section-card"><div class="section-heading">${heading}</div>
-      <table><thead><tr><th></th>${BS_COLUMN_KEYS.map(k => `<th>${COLUMN_LABELS[k]}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
-  }
-
-  function buildBalanceSheetCards(quarter) {
-    const fixedAssets = bsSumStructure(quarter, 'fixedAssets', FIXED_ASSETS_STRUCTURE);
-    const currentAssets = bsSumStructure(quarter, 'currentAssets', CURRENT_ASSETS_STRUCTURE);
-    const netAssets = emptyFigures(BS_COLUMN_KEYS);
-    BS_COLUMN_KEYS.forEach(k => { netAssets[k] = fixedAssets[k] + currentAssets[k]; });
-
-    const fixedRows = FIXED_ASSETS_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'fixedAssets', line))).join('')
-      + bsRow('TOTAL FIXED ASSETS', fixedAssets, { underline:true });
-    const currentRows = CURRENT_ASSETS_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'currentAssets', line))).join('')
-      + bsRow('NET CURRENT ASSETS', currentAssets, { underline:true });
-    const netAssetsCard = bsTableWrapper('Net Assets', bsRow('NET ASSETS', netAssets, { underline:true }));
-
-    return bsTableWrapper('Fixed Assets', fixedRows)
-      + bsTableWrapper('Current Assets', currentRows)
-      + netAssetsCard;
-  }
-
-  function buildReservesCards(quarter) {
-    const unrestricted = bsSumStructure(quarter, 'unrestrictedReserves', UNRESTRICTED_RESERVES_STRUCTURE);
-    const designated = bsSumStructure(quarter, 'designatedFutureFund', DESIGNATED_FUTURE_FUND_STRUCTURE);
-    const netAssets = emptyFigures(BS_COLUMN_KEYS);
-    BS_COLUMN_KEYS.forEach(k => { netAssets[k] = unrestricted[k] + designated[k]; });
-
-    const unrestrictedRows = UNRESTRICTED_RESERVES_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'unrestrictedReserves', line))).join('')
-      + bsRow('', unrestricted, { underline:true });
-    const designatedRows = DESIGNATED_FUTURE_FUND_STRUCTURE.map(line => bsRow(line.label, bsComputeTotal(quarter, 'designatedFutureFund', line))).join('')
-      + bsRow('', designated, { underline:true });
-    const netAssetsCard = bsTableWrapper('Net Assets', bsRow('NET ASSETS', netAssets, { underline:true }));
-
-    return bsTableWrapper('Unrestricted Reserves', unrestrictedRows)
-      + bsTableWrapper('Designated Future Fund', designatedRows)
-      + netAssetsCard;
-  }
-
-  let financeExpanded = { income: new Set(), expenditure: new Set() };
-
-  function buildIncomeExpenditureCards(quarter) {
-    const incomeTable = buildGroupTable(quarter, 'income', INCOME_STRUCTURE, financeExpanded.income);
-    const expenditureTable = buildGroupTable(quarter, 'expenditure', EXPENDITURE_STRUCTURE, financeExpanded.expenditure);
-    return `<div class="section-card"><div class="section-heading">Income</div>${incomeTable}</div>
-      <div class="section-card"><div class="section-heading">Expenditure</div>${expenditureTable}</div>`;
-  }
-
-  document.getElementById('detail-content').addEventListener('click', e => {
-    const toggle = e.target.closest('[data-toggle-label]');
-    if (!toggle || !currentFinanceQuarter) return;
-    const label = decodeURIComponent(toggle.dataset.toggleLabel);
-    const inIncome = INCOME_STRUCTURE.some(l => l.label === label);
-    const group = inIncome ? 'income' : 'expenditure';
-    const set = financeExpanded[group];
-    if (set.has(label)) set.delete(label); else set.add(label);
-    showFinanceDetail(currentFinanceQuarter.id, true);
-  });
-
-  function hasActuals(q) {
-    const income = sumStructure(q, 'income', INCOME_STRUCTURE);
-    return income.actual !== 0;
-  }
-
-  function showFinanceDetail(id, isToggleRefresh) {
-    const quarter = allQuarters.find(q => q.id === id);
-    if (!quarter) return;
-    currentFinanceQuarter = quarter;
-    const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
-    const scrollPos = isToggleRefresh ? window.scrollY : 0;
-    const headline = buildHeadlineCard(quarter);
-    const incomeExpenditure = buildIncomeExpenditureCards(quarter);
-    const depreciationCard = buildDepreciationCard(quarter);
-    const notes = quarter.notes ? `<div class="notes-card"><div class="notes-label">Notes</div><div class="notes-text">${quarter.notes}</div></div>` : '';
-    const charts = hasActuals(quarter) ? `<div class="chart-buttons">
-      <button class="chart-btn" onclick="window._showChart('income')">Income breakdown</button>
-      <button class="chart-btn" onclick="window._showChart('expenditure')">Expenditure breakdown</button>
-    </div>` : '';
-    document.getElementById('detail-content').innerHTML = headline + incomeExpenditure + depreciationCard + notes + charts;
-    document.getElementById('list-view').style.display = 'none';
-    document.getElementById('detail-view').style.display = 'block';
-    document.getElementById('chart-view').style.display = 'none';
-    document.getElementById('detail-title').textContent = label;
-    if (isToggleRefresh) {
-      window.scrollTo(0, scrollPos);
-    } else {
-      financeExpanded.income.clear();
-      financeExpanded.expenditure.clear();
-      window.scrollTo(0,0);
-    }
-  }
-
-  document.getElementById('back-to-list').addEventListener('click', () => {
-    document.getElementById('detail-view').style.display = 'none';
-    document.getElementById('list-view').style.display = 'block';
-    window.scrollTo(0,0);
-  });
-  document.getElementById('back-to-detail').addEventListener('click', () => {
-    document.getElementById('chart-view').style.display = 'none';
-    document.getElementById('detail-view').style.display = 'block';
-    window.scrollTo(0,0);
-  });
-
-  function showBalanceDetail(id) {
-    const quarter = allQuarters.find(q => q.id === id);
-    if (!quarter) return;
-    const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
-    const balanceSheetCards = buildBalanceSheetCards(quarter);
-    const reservesCards = buildReservesCards(quarter);
-    document.getElementById('balance-detail-content').innerHTML = balanceSheetCards
-      + '<div class="section-heading-dark" style="margin-top:8px;">Reserves Reconciliation</div>'
-      + reservesCards;
-    document.getElementById('balance-list-view').style.display = 'none';
-    document.getElementById('balance-detail-view').style.display = 'block';
-    document.getElementById('balance-detail-title').textContent = label;
-    window.scrollTo(0,0);
-  }
-
-  document.getElementById('balance-back-to-list').addEventListener('click', () => {
-    document.getElementById('balance-detail-view').style.display = 'none';
-    document.getElementById('balance-list-view').style.display = 'block';
-    window.scrollTo(0,0);
-  });
-
-  const CHART_COLOURS = ['#2979FF','#FF6D00','#2EC4B6','#FFD166','#8338EC','#FF4081','#00BFA5','#FFAB00'];
-
-  function topLevelSlices(quarter, group, structure) {
-    return structure.map(line => ({
-      label: line.label,
-      value: computeTotal(quarter, group, line).actual
-    })).filter(s => s.value > 0);
-  }
-
-  window._showChart = function(type) {
-    const quarter = currentFinanceQuarter;
-    if (!quarter) return;
-    const label = quarter.year ? `${quarter.quarter} ${quarter.year}` : quarter.quarter;
-    let title, slicesData;
-    if (type === 'income') {
-      title = 'Income breakdown';
-      slicesData = topLevelSlices(quarter, 'income', INCOME_STRUCTURE);
-    } else {
-      title = 'Expenditure breakdown';
-      slicesData = topLevelSlices(quarter, 'expenditure', EXPENDITURE_STRUCTURE);
-    }
-    const slices = slicesData.map((s,i) => ({ l:s.label, v:s.value, c:CHART_COLOURS[i % CHART_COLOURS.length] }));
-    if (currentChart) { currentChart.destroy(); currentChart = null; }
-    document.getElementById('chart-month-title').textContent = label;
-    document.getElementById('chart-title').textContent = title;
-    document.getElementById('detail-view').style.display = 'none';
-    document.getElementById('chart-view').style.display = 'block';
-    const ctx = document.getElementById('myChart');
-    currentChart = new Chart(ctx, {
-      type:'pie',
-      data:{ labels:slices.map(s=>s.l), datasets:[{ data:slices.map(s=>s.v), backgroundColor:slices.map(s=>s.c), borderColor:'#1a56cc', borderWidth:2 }] },
-      options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'white', padding:16, font:{size:13} } },
-        tooltip:{ callbacks:{ label(ctx){ const v=ctx.parsed,t=ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${new Intl.NumberFormat('en-GB').format(v)} (${((v/t)*100).toFixed(1)}%)`; } } } } }
-    });
-    window.scrollTo(0,0);
-  };
-
-  // ── MEETINGS (Board / FC / Fundraising — unchanged) ────────────────────────
+  // ── MEETINGS (Board — the club's single committee; FC and Fundraising ──────
+  // ── were retired in favour of the Finances/Membership/Team Results Groups) ─
 
   const COMMITTEE_COLLECTIONS = {
-    board:       { meetings:'board-meetings',       agenda:'board-agenda',       minutes:'board-minutes',       actions:'board-actions',       comments:'board-comments' },
-    fc:          { meetings:'fc-meetings',           agenda:'fc-agenda',          minutes:'fc-minutes',          actions:'fc-actions',          comments:'fc-comments' },
-    fundraising: { meetings:'fundraising-meetings',  agenda:'fundraising-agenda', minutes:'fundraising-minutes', actions:'fundraising-actions', comments:'fundraising-comments' },
+    board: { meetings:'board-meetings', agenda:'board-agenda', minutes:'board-minutes', actions:'board-actions', comments:'board-comments' },
   };
 
   function formatDate(ts) {
@@ -1581,7 +812,7 @@
     } catch(e) { console.error(e); listEl.innerHTML = '<p class="empty-state">Error loading meetings.</p>'; }
   }
 
-  ['board','fc','fundraising'].forEach(prefix => {
+  ['board'].forEach(prefix => {
     document.getElementById(prefix + '-add-meeting-btn').addEventListener('click', () => {
       document.getElementById(prefix + '-meetings-list-view').style.display = 'none';
       document.getElementById(prefix + '-add-meeting-form').style.display = 'block';
@@ -1624,9 +855,7 @@
     detail.querySelector('[data-subtab="' + prefix + '-panel-papers"]').classList.add('active');
     document.getElementById(prefix + '-panel-papers').style.display = 'block';
     document.getElementById(prefix + '-panel-papers').classList.add('active');
-    const canPost = prefix === 'board'
-      ? (isCEO() || currentUserData?.chairBoard || currentUserData?.chairFC || currentUserData?.chairFundraising)
-      : canPostForCommittee(prefix);
+    const canPost = canPostForCommittee(prefix);
     document.getElementById(prefix + '-papers-compose').style.display  = canPost ? 'block' : 'none';
     document.getElementById(prefix + '-minutes-compose').style.display = canPost ? 'block' : 'none';
     document.getElementById(prefix + '-actions-compose').style.display = canPost ? 'block' : 'none';
@@ -1705,7 +934,7 @@
     } catch(e) { console.error(e); }
   }
 
-  ['board','fc','fundraising'].forEach(prefix => {
+  ['board'].forEach(prefix => {
     document.getElementById(prefix + '-post-papers-btn').addEventListener('click', async () => {
       const fileInput  = document.getElementById(prefix + '-papers-file');
       const descInput  = document.getElementById(prefix + '-papers-desc');
@@ -1731,7 +960,7 @@
     });
   });
 
-  ['board','fc','fundraising'].forEach(prefix => {
+  ['board'].forEach(prefix => {
     document.getElementById(prefix + '-post-minutes-btn').addEventListener('click', async () => {
       const fileInput  = document.getElementById(prefix + '-minutes-file');
       const progressEl = document.getElementById(prefix + '-minutes-upload-progress');
@@ -1877,7 +1106,7 @@
     } catch(e) { console.error(e); }
   }
 
-  ['board','fc','fundraising'].forEach(prefix => {
+  ['board'].forEach(prefix => {
     document.querySelectorAll(`#${prefix}-tab-outstanding .filter-btn`).forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll(`#${prefix}-tab-outstanding .filter-btn`).forEach(b => b.classList.remove('active'));
@@ -1894,7 +1123,7 @@
     });
   });
 
-  ['board','fc','fundraising'].forEach(prefix => {
+  ['board'].forEach(prefix => {
     document.getElementById(prefix + '-post-action-btn').addEventListener('click', async () => {
       const title = document.getElementById(prefix + '-action-title').value.trim();
       if (!title) return;
@@ -1999,24 +1228,28 @@
 
 
   // ════════════════════════════════════════════════════════════════════════
-  // ── GROUPS ENGINE (new) ───────────────────────────────────────────────────
+  // ── GROUPS ENGINE ──────────────────────────────────────────────────────────
   // ════════════════════════════════════════════════════════════════════════
   //
   // A "group" is a generic container: standing committee sections
-  // (Finances, Membership, Team Results, Agendas & Minutes, Discussion),
-  // sub-committees (e.g. Resurfacing), and events (e.g. AGM). Each has
-  // a document list and, optionally, a discussion thread.
+  // (Finances, Membership, Team Results, Discussion), sub-committees
+  // (e.g. Resurfacing), and events (e.g. AGM). Each has a document list
+  // and, optionally, a discussion thread.
   //
-  // The five standing fixtures are created once via ensureFixtureGroups()
+  // The four standing fixtures are created once via ensureFixtureGroups()
   // below, which runs harmlessly every time the app loads — it only
   // creates a fixture if one with that exact name doesn't already exist.
+  //
+  // Note: Board's own agendas/minutes/actions live in its own dedicated
+  // meeting structure (see COMMITTEE_COLLECTIONS above), not here — an
+  // earlier "Agendas & Minutes" fixture group was retired once that
+  // became clear, to avoid two competing homes for the same material.
 
   const FIXTURE_GROUPS = [
-    { name: 'Finances',          hasDiscussion: false, hasMeetings: false, isPlaceholder: false },
-    { name: 'Membership',        hasDiscussion: false, hasMeetings: false, isPlaceholder: false },
-    { name: 'Team Results',      hasDiscussion: false, hasMeetings: false, isPlaceholder: false },
-    { name: 'Agendas & Minutes', hasDiscussion: false, hasMeetings: false, isPlaceholder: true  },
-    { name: 'Discussion',        hasDiscussion: true,  hasMeetings: false, isPlaceholder: false },
+    { name: 'Finances',     hasDiscussion: false, hasMeetings: false },
+    { name: 'Membership',   hasDiscussion: false, hasMeetings: false },
+    { name: 'Team Results', hasDiscussion: false, hasMeetings: false },
+    { name: 'Discussion',   hasDiscussion: true,  hasMeetings: false },
   ];
 
   let allGroups = [];          // cached list of {id, ...data}
@@ -2025,16 +1258,6 @@
   let currentTopicId = null;
 
   async function ensureFixtureGroups() {
-    console.log('DEBUG ensureFixtureGroups called. currentUserData=', currentUserData, 'isAdmin()=', isAdmin());
-    // Isolated test: read our OWN users doc again, directly, right here,
-    // to check whether a plain getDoc on /users/{uid} succeeds on its own
-    // (separate from any /groups rule logic that might call get() internally).
-    try {
-      const selfCheck = await getDoc(doc(db, 'users', currentUser.uid));
-      console.log('DEBUG isolated self-read of users/{uid} SUCCEEDED. exists=', selfCheck.exists());
-    } catch(e2) {
-      console.log('DEBUG isolated self-read of users/{uid} FAILED. code=', e2.code, 'message=', e2.message);
-    }
     if (!isAdmin()) return; // only an admin/superadmin session can create them
     try {
       const snap = await getDocs(collection(db, 'groups'));
@@ -2045,7 +1268,6 @@
             name: fx.name,
             type: 'standing',
             isFixture: true,
-            isPlaceholder: fx.isPlaceholder,
             visibleToAllCommittee: true,
             memberUids: [],
             hasDiscussion: fx.hasDiscussion,
@@ -2055,12 +1277,7 @@
           });
         }
       }
-    } catch(e) {
-      console.error('Could not verify/create fixture groups', e);
-      console.log('DEBUG full error: code=', e.code, 'message=', e.message, 'name=', e.name, 'stack=', e.stack);
-      console.log('DEBUG error keys=', Object.keys(e));
-      try { console.log('DEBUG error JSON=', JSON.stringify(e)); } catch(_) { console.log('DEBUG error JSON= (could not stringify)'); }
-    }
+    } catch(e) { console.error('Could not verify/create fixture groups', e); }
   }
 
   async function loadGroups() {
@@ -2165,7 +1382,6 @@
       await addDoc(collection(db, 'groups'), {
         name, type,
         isFixture: false,
-        isPlaceholder: false,
         visibleToAllCommittee: false,
         memberUids,
         hasDiscussion,
@@ -2220,17 +1436,12 @@
     document.getElementById('group-discussion-tab-btn').style.display = g.hasDiscussion ? 'inline-block' : 'none';
     document.getElementById('group-members-tab-btn').style.display = g.visibleToAllCommittee ? 'none' : 'inline-block';
 
-    // Documents panel: placeholder vs active
-    const isPlaceholder = g.isPlaceholder === true;
-    document.getElementById('group-docs-placeholder').style.display = isPlaceholder ? 'block' : 'none';
-    document.getElementById('group-docs-active').style.display = isPlaceholder ? 'none' : 'block';
-
-    if (!isPlaceholder) {
-      const canUpload = isAdmin() || g.memberUids?.includes(currentUser.uid) || g.visibleToAllCommittee;
-      document.getElementById('group-docs-compose').style.display = canUpload ? 'block' : 'none';
-      setupDropzone('group-doc-dropzone', 'group-doc-file', 'group-doc-selected');
-      loadGroupDocuments();
-    }
+    document.getElementById('group-docs-placeholder').style.display = 'none';
+    document.getElementById('group-docs-active').style.display = 'block';
+    const canUpload = isAdmin() || g.memberUids?.includes(currentUser.uid) || g.visibleToAllCommittee;
+    document.getElementById('group-docs-compose').style.display = canUpload ? 'block' : 'none';
+    setupDropzone('group-doc-dropzone', 'group-doc-file', 'group-doc-selected');
+    loadGroupDocuments();
   }
 
   async function loadGroupDocuments() {
@@ -2534,7 +1745,7 @@
       allUsers.forEach(u => {
         const row = document.createElement('div');
         row.className = 'user-row';
-        const committees = [u.isBoardMember?'Board':'', u.isFCMember?'Finance Cttee':'', u.isFundraisingMember?'Fundraising':''].filter(Boolean).join(', ');
+        const committees = [u.isBoardMember?'Board':''].filter(Boolean).join(', ');
         const roleBadgeClass = u.role === 'superadmin' ? 'role-superadmin' : u.role === 'admin' ? 'role-admin' : u.role === 'ceo' ? 'role-ceo' : 'role-other';
         const roleLabel = u.role === 'superadmin' ? 'Super Admin' : u.role === 'admin' ? 'Admin' : u.role === 'ceo' ? 'CEO' : (u.role || '—');
         row.innerHTML = `<div><div class="user-row-info">${u.firstName || ''} ${u.lastName || ''} — ${u.email || ''}
@@ -2576,11 +1787,7 @@
         email,
         role,
         isBoardMember:      document.getElementById('nu-is-board').checked,
-        isFCMember:         document.getElementById('nu-is-fc').checked,
-        isFundraisingMember:document.getElementById('nu-is-fundraising').checked,
         chairBoard:         document.getElementById('nu-chair-board').checked,
-        chairFC:            document.getElementById('nu-chair-fc').checked,
-        chairFundraising:   document.getElementById('nu-chair-fundraising').checked,
         createdAt:          serverTimestamp()
       });
       document.getElementById('new-user-uid').value = '';
